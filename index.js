@@ -1,6 +1,14 @@
 // Import Express
 const express = require('express') // nhung express vao project
-const path = require('path')
+const path = require('path');
+const mongoose = require('mongoose');
+mongoose.connect('mongodb+srv://maildominhkhoi_db_user:zIy0iSpkLzXDrgri@cluster0.a4qwbbe.mongodb.net/tour-du-lich');
+
+// Tạo model Tour để thao tác vơi collection tours trong MongoDB như thêm, sửa, xóa, tìm kiếm dữ liệu
+const Tour = mongoose.model('Tour', {
+    name: String,
+    vehicle: String
+});
 
 const app = express()   // tao mot ung dung express
 const port = 3000
@@ -12,17 +20,21 @@ app.set('view engine', 'pug');
 // Thiết lập thư mục tĩnh của frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // Define a route
 app.get('/', (req, res) => {
     res.render('client/pages/home', {
-        pageTitle: 'Home Page 123'
+        pageTitle: 'Trang chủ'
     })  // home.pug hoặc home thôi cũng được vì đã có views và view engine là pug rồi
 })
 
-app.get('/tours', (req, res) => {
+app.get('/tours', async (req, res) => {
+    const tourList = await Tour.find({}); // await để chờ kết quả trả về rồi mới tiếp tục chạy code phía sau, muốn dùng await thì phải có async ở trước function
+
+    console.log(tourList);
+
     res.render('client/pages/tour-list', {
-        pageTitle: 'Tour List 123'
+        pageTitle: 'Danh sách tour',
+        tourList: tourList
     })
 })
 
@@ -30,3 +42,4 @@ app.get('/tours', (req, res) => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`)
 })
+
