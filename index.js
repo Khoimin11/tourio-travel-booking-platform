@@ -1,8 +1,10 @@
 // Import Express
 const express = require('express') // nhung express vao project
 const path = require('path');
+require('dotenv').config();
+
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://maildominhkhoi_db_user:zIy0iSpkLzXDrgri@cluster0.a4qwbbe.mongodb.net/tour-du-lich');
+mongoose.connect(process.env.DATABASE);
 
 // Tạo model Tour để thao tác vơi collection tours trong MongoDB như thêm, sửa, xóa, tìm kiếm dữ liệu
 const Tour = mongoose.model('Tour', {
