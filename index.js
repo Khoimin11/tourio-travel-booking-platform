@@ -5,7 +5,8 @@ require('dotenv').config(); // nhung dotenv vao project de doc duoc file .env
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DATABASE);
 
-const Tour = require('./models/tour.model') // nhung model Tour vào file index.js
+const homeController = require('./controllers/client/home.controller');
+const tourController = require('./controllers/client/tour.controller');
 
 const app = express()   // tao mot ung dung express
 const port = 3000
@@ -18,22 +19,9 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Define a route
-app.get('/', (req, res) => {
-    res.render('client/pages/home', {    // home.pug hoặc home thôi cũng được vì đã có views và view engine là pug rồi
-        pageTitle: 'Trang chủ'
-    }) 
-})
+app.get('/', homeController.home)
 
-app.get('/tours', async (req, res) => {
-    const tourList = await Tour.find({}); // await để chờ kết quả trả về rồi mới tiếp tục chạy code phía sau, muốn dùng await thì phải có async ở trước function
-
-    console.log(tourList);
-
-    res.render('client/pages/tour-list', {
-        pageTitle: 'Danh sách tour',
-        tourList: tourList
-    })
-})
+app.get('/tours', tourController.list)
 
 // Start the server
 app.listen(port, () => {
