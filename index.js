@@ -1,16 +1,11 @@
-// Import Express
 const express = require('express') // nhung express vao project
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config(); // nhung dotenv vao project de doc duoc file .env
 
 const mongoose = require('mongoose');
 mongoose.connect(process.env.DATABASE);
 
-// Tạo model Tour để thao tác vơi collection tours trong MongoDB như thêm, sửa, xóa, tìm kiếm dữ liệu
-const Tour = mongoose.model('Tour', {
-    name: String,
-    vehicle: String
-});
+const Tour = require('./models/tour.model') // nhung model Tour vào file index.js
 
 const app = express()   // tao mot ung dung express
 const port = 3000
@@ -24,9 +19,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Define a route
 app.get('/', (req, res) => {
-    res.render('client/pages/home', {
+    res.render('client/pages/home', {    // home.pug hoặc home thôi cũng được vì đã có views và view engine là pug rồi
         pageTitle: 'Trang chủ'
-    })  // home.pug hoặc home thôi cũng được vì đã có views và view engine là pug rồi
+    }) 
 })
 
 app.get('/tours', async (req, res) => {
