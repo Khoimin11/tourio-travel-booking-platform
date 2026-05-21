@@ -5,7 +5,7 @@ const port = 3000
 
 // Define a route
 app.get('/', (req, res) => {
-    res.send('Trang chu')
+    res.send('Trang chu cua Do Minh Khoi')
 })
 
 app.get('/tours', (req, res) => {
