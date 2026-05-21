@@ -1,15 +1,25 @@
 // Import Express
 const express = require('express') // nhung express vao project
+const path = require('path')
+
 const app = express()   // tao mot ung dung express
 const port = 3000
 
+// Thiết lập view
+app.set('views', path.join(__dirname, 'views')); // __dirname chinh la thu muc goc
+app.set('view engine', 'pug');
+
 // Define a route
 app.get('/', (req, res) => {
-    res.send('Trang chu cua Do Minh Khoi')
+    res.render('client/pages/home', {
+        pageTitle: 'Home Page 123'
+    })  // home.pug hoặc home thôi cũng được vì đã có views và view engine là pug rồi
 })
 
 app.get('/tours', (req, res) => {
-    res.send('Danh sach tour du lịch')
+    res.render('client/pages/tour-list', {
+        pageTitle: 'Tour List 123'
+    })
 })
 
 // Start the server
