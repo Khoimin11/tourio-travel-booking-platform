@@ -1,28 +1,27 @@
-const express = require('express') // nhung express vao project
+const express = require('express')
 const path = require('path');
-require('dotenv').config(); // nhung dotenv vao project de doc duoc file .env
-const database = require('./config/database');
-const clientRoutes = require('./routes/client/index.route');
+require('dotenv').config();
+const database = require("./config/database");
+const adminRoutes = require("./routes/admin/index.route");
+const clientRoutes = require("./routes/client/index.route");
 
-const app = express()   // tao mot ung dung express
+const app = express()
 const port = 3000
 
-// Ket noi database
-database.connectDB();
+// Kết nối Database
+database.connect();
 
 // Thiết lập views
-app.set('views', path.join(__dirname, 'views')); // __dirname chinh la thu muc goc, chỉ định phải đi vào thư mục gốc trước khi vào views
+app.set('views', path.join(__dirname, "views"));
 app.set('view engine', 'pug');
 
-// Thiết lập thư mục tĩnh của frontend
-app.use(express.static(path.join(__dirname, 'public')));
+// Thiết lập thư mục chứa file tĩnh của Frontend
+app.use(express.static(path.join(__dirname, "public")));
 
 // Thiết lập đường dẫn
-app.use('/', clientRoutes);
+app.use("/admin", adminRoutes);
+app.use("/", clientRoutes);
 
-
-// Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`)
+  console.log(`Website đang chạy trên cổng ${port}`)
 })
-
