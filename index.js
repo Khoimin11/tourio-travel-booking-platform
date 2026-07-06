@@ -9,7 +9,7 @@ const app = express()
 const port = 3000
 
 // Kết nối Database
-database.connect();
+database.connectDB();
 
 // Thiết lập views
 app.set('views', path.join(__dirname, "views"));
