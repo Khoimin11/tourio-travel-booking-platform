@@ -19,4 +19,10 @@ router.use('/contact', contactRoutes)
 router.use('/setting', settingRoutes)
 router.use('/profile', profileRoutes)
 
+router.use((req, res) => {
+  res.status(404).render("admin/pages/error-404", {
+    pageTitle: "404 Not Found"
+  })
+})
+
 module.exports = router;
