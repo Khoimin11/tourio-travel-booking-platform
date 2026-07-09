@@ -271,7 +271,7 @@ input, button, textarea {
     background-color: #00000082;
     position: absolute;
     top: 0;
-    left: -18px;
+    left: -15px;
   }
 
   .header .inner-menu > ul > li.active > i::before {
@@ -759,7 +759,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 .product-item .inner-content .inner-title a {
@@ -1135,7 +1134,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 @media (max-width: 575.98px) {
@@ -1198,7 +1196,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-  line-clamp: 1;
 }
 
 .blog-item-2 .inner-content .inner-desc {
@@ -1209,7 +1206,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 @media (max-width: 575.98px) {
@@ -2070,7 +2066,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 .box-tour-detail .inner-product .inner-info .inner-rating {
@@ -2514,7 +2509,6 @@ input, button, textarea {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
 }
 
 .section-11 .inner-tour-item .inner-product .inner-content .inner-title a:hover {
@@ -2906,3 +2900,20 @@ input, button, textarea {
   }
 }
 /* End Section 12 */
+
+/* Alert */
+.alert {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 999;
+  background-color: #ddd;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.alert-success {
+  background-color: #a3e0a3;
+}
+/* End Alert */
