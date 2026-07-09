@@ -10,17 +10,12 @@ module.exports.list = async (req, res) => {
 }
 
 module.exports.websiteInfo = async (req, res) => {
-  let settingWebsiteInfo = await SettingWebsiteInfo.findOne({});
-
-  // Nếu chưa có thì tạo mới
-  if (!settingWebsiteInfo) {
-    settingWebsiteInfo = await new SettingWebsiteInfo({}).save();
-  }
+  const settingWebsiteInfo = await SettingWebsiteInfo.findOne({});
 
   res.render("admin/pages/setting-website-info", {
     pageTitle: "Thông tin website",
-    settingWebsiteInfo
-  });
+    settingWebsiteInfo: settingWebsiteInfo
+  })
 }
 
 module.exports.websiteInfoPatch = async (req, res) => {
@@ -67,8 +62,13 @@ module.exports.accountAdminCreate = async (req, res) => {
 }
 
 module.exports.roleList = async (req, res) => {
+  const roleList = await Role.find({
+    deleted: false
+  })
+
   res.render("admin/pages/setting-role-list", {
-    pageTitle: "Nhóm quyền"
+    pageTitle: "Nhóm quyền",
+    roleList: roleList
   })
 }
 
