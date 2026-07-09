@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
 :root {
   --color-primary: #4502C7;
@@ -758,6 +758,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
@@ -1063,8 +1064,8 @@ input, button, textarea {
 }
 
 .section-8 .blog-item-2 {
-  grid-column: span 2; /* Chiếm 2 cột */
-  grid-row: span 2;    /* Chiếm 2 hàng */
+  grid-column: span 2; /* Chiáº¿m 2 cá»™t */
+  grid-row: span 2;    /* Chiáº¿m 2 hÃ ng */
 }
 
 @media (max-width: 991.98px) {
@@ -1073,7 +1074,7 @@ input, button, textarea {
   }
 
   .section-8 .blog-item-2 {
-    grid-row: 2 / span 2;    /* Chiếm 2 hàng */
+    grid-row: 2 / span 2;    /* Chiáº¿m 2 hÃ ng */
   }
 }
 
@@ -1133,6 +1134,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
@@ -1195,6 +1197,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 1;
   -webkit-line-clamp: 1;
 }
 
@@ -1205,6 +1208,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
@@ -2065,6 +2069,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
@@ -2508,6 +2513,7 @@ input, button, textarea {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
