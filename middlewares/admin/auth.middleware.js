@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const AccountAdmin = require('../../models/account-admin.model');
 const Role = require('../../models/role.model');
+const Order = require('../../models/order.model');
+const moment = require("moment");
 
 module.exports.verifyToken = async (req, res, next) => {
   try {
@@ -36,9 +38,42 @@ module.exports.verifyToken = async (req, res, next) => {
 
     req.permissions = role.permissions;
 
+    let unreadOrderNotificationCount = 0;
+    let orderNotificationList = [];
+
+    if(!existAccount.orderNotificationSeenAt) {
+      existAccount.orderNotificationSeenAt = new Date();
+      await existAccount.save();
+    } else {
+      unreadOrderNotificationCount = await Order.countDocuments({
+        deleted: false,
+        createdAt: {
+          $gt: existAccount.orderNotificationSeenAt
+        }
+      });
+
+      orderNotificationList = await Order.find({
+        deleted: false,
+        createdAt: {
+          $gt: existAccount.orderNotificationSeenAt
+        }
+      })
+        .sort({
+          createdAt: "desc"
+        })
+        .limit(10)
+        .select("id orderCode fullName createdAt");
+    }
+
+    for (const item of orderNotificationList) {
+      item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
+    }
+
     res.locals.account = existAccount;
 
     res.locals.permissions = role.permissions;
+    res.locals.orderNotificationList = orderNotificationList;
+    res.locals.unreadOrderNotificationCount = unreadOrderNotificationCount;
 
     next();
   } catch (error) {

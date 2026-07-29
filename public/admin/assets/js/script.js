@@ -16,6 +16,62 @@ if(buttonMenuMobile) {
 }
 // End Menu Mobile
 
+// Notify Dropdown
+const notifyDropdown = document.querySelector("[notify-dropdown]");
+if(notifyDropdown) {
+  const notifyPopup = notifyDropdown.querySelector("[notify-popup]");
+  const notifyBadge = notifyDropdown.querySelector("[notify-badge]");
+  const dataApi = notifyDropdown.getAttribute("data-api");
+  let markedSeen = false;
+
+  const closeNotifyPopup = () => {
+    notifyDropdown.classList.remove("active");
+  }
+
+  notifyDropdown.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const isActive = notifyDropdown.classList.contains("active");
+    if(isActive) {
+      closeNotifyPopup();
+      return;
+    }
+
+    notifyDropdown.classList.add("active");
+
+    if(!markedSeen && notifyBadge && dataApi) {
+      markedSeen = true;
+      fetch(dataApi, {
+        method: "PATCH"
+      })
+        .then(res => res.json())
+        .then(data => {
+          if(data.code == "success") {
+            notifyBadge.remove();
+          } else {
+            markedSeen = false;
+          }
+        })
+        .catch(() => {
+          markedSeen = false;
+        })
+    }
+  })
+
+  if(notifyPopup) {
+    notifyPopup.addEventListener("click", (event) => {
+      event.stopPropagation();
+    })
+  }
+
+  document.addEventListener("click", (event) => {
+    if(!notifyDropdown.contains(event.target)) {
+      closeNotifyPopup();
+    }
+  })
+}
+// End Notify Dropdown
+
 // Schedule Section 8
 const scheduleSection8 = document.querySelector(".section-8 .inner-schedule");
 if(scheduleSection8) {

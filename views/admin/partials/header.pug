@@ -1,12 +1,27 @@
 header.header
   .inner-logo
     a(href=`/${pathAdmin}/dashboard`)
-      span 28
+      span Tourio
       span Admin
   .inner-wrap
-    .inner-notify
+    .inner-notify(notify-dropdown data-api=`/${pathAdmin}/notification/order/seen`)
       img(src="/admin/assets/images/icon-bell.svg", alt="")
-      span 6
+      if unreadOrderNotificationCount > 0
+        span(notify-badge) #{unreadOrderNotificationCount}
+      .inner-notify-popup(notify-popup)
+        .inner-notify-head
+          span.inner-title Thông báo đơn hàng
+        if orderNotificationList.length > 0
+          .inner-notify-list
+            each item in orderNotificationList
+              a(
+                class="inner-notify-item"
+                href=`/${pathAdmin}/order/edit/${item.id}`
+              )
+                .inner-notify-text #{item.fullName} đã đặt hàng vào lúc #{item.createdAtFormat}
+                .inner-notify-code Mã đơn: #{item.orderCode}
+        else
+          .inner-notify-empty Chưa có thông báo mới
     .inner-account
       .inner-avatar
         img(src=account.avatar, alt=account.fullName)
