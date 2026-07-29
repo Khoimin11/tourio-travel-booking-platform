@@ -7,6 +7,7 @@ const categoryHelper = require("../../helpers/category.helper");
 module.exports.list = async (req, res) => {
   // Lấy slug từ params
   const slug = req.params.slug;
+  const currentSort = req.query.sort || "";
 
   // Tìm danh mục theo slug
   const category = await Category.findOne({
@@ -69,6 +70,17 @@ module.exports.list = async (req, res) => {
 
     for(const item of tourList) {
       item.departureDateFormat = moment(item.departureDate).format("DD/MM/YYYY");
+      item.discountPercent = item.priceAdult > 0
+        ? parseInt(((item.priceAdult - item.priceNewAdult) / item.priceAdult) * 100)
+        : 0;
+    }
+
+    if(currentSort === "price-asc") {
+      tourList.sort((a, b) => a.priceNewAdult - b.priceNewAdult);
+    } else if(currentSort === "price-desc") {
+      tourList.sort((a, b) => b.priceNewAdult - a.priceNewAdult);
+    } else if(currentSort === "discount-desc" || !currentSort) {
+      tourList.sort((a, b) => b.discountPercent - a.discountPercent);
     }
     // Hết Danh sách tour
 
@@ -82,7 +94,8 @@ module.exports.list = async (req, res) => {
       category: category,
       tourList: tourList,
       totalTour: totalTour,
-      cityList: cityList
+      cityList: cityList,
+      currentSort: currentSort
     });
   } else {
     res.redirect("/");

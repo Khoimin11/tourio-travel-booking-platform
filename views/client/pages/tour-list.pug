@@ -3,6 +3,9 @@ include ../mixins/box-breadcrumb.pug
 include ../mixins/product-item.pug
 
 block main
+  -
+    const sortBaseUrl = `/category/${category.slug}`;
+    const buildSortLink = (sortValue) => `${sortBaseUrl}?sort=${sortValue}`;
   // Breadcrumb
   +box-breadcrumb(breadcrumb)
   // End Breadcrumb
@@ -79,13 +82,22 @@ block main
             .inner-sort
               .inner-label Sắp xếp:
               .inner-list
-                button
+                a(
+                  href=buildSortLink("price-asc")
+                  class=currentSort === "price-asc" ? "active" : ""
+                )
                   | Giá tăng dần
                   i.fa-solid.fa-square-caret-up
-                button
+                a(
+                  href=buildSortLink("price-desc")
+                  class=currentSort === "price-desc" ? "active" : ""
+                )
                   | Giá giảm dần
                   i.fa-solid.fa-square-caret-down
-                button.active
+                a(
+                  href=buildSortLink("discount-desc")
+                  class=currentSort === "discount-desc" || !currentSort ? "active" : ""
+                )
                   | Khuyến Mại Hot
                   i.fa-solid.fa-tag
                 button

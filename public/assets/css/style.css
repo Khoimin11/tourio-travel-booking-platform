@@ -1716,7 +1716,8 @@ input, button, textarea {
   gap: 16px;
 }
 
-.section-9 .inner-info-2 .inner-sort .inner-list button {
+.section-9 .inner-info-2 .inner-sort .inner-list button,
+.section-9 .inner-info-2 .inner-sort .inner-list a {
   padding: 0;
   border: 0;
   background-color: transparent;
@@ -1724,15 +1725,19 @@ input, button, textarea {
   font-size: 12px;
   color: #747578;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.section-9 .inner-info-2 .inner-sort .inner-list button i {
+.section-9 .inner-info-2 .inner-sort .inner-list button i,
+.section-9 .inner-info-2 .inner-sort .inner-list a i {
   font-size: 16px;
   margin-left: 5px;
 }
 
 .section-9 .inner-info-2 .inner-sort .inner-list button.active,
-.section-9 .inner-info-2 .inner-sort .inner-list button:hover {
+.section-9 .inner-info-2 .inner-sort .inner-list button:hover,
+.section-9 .inner-info-2 .inner-sort .inner-list a.active,
+.section-9 .inner-info-2 .inner-sort .inner-list a:hover {
   color: #F9313D;
 }
 
