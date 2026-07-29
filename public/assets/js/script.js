@@ -149,10 +149,18 @@ if(clockExpire) {
       listBoxNumber[2].innerHTML = `${minutes}`.padStart(2, '0');
       listBoxNumber[3].innerHTML = `${seconds}`.padStart(2, '0');
     } else {
+      const listBoxNumber = clockExpire.querySelectorAll('.inner-number');
+      listBoxNumber[0].innerHTML = '00';
+      listBoxNumber[1].innerHTML = '00';
+      listBoxNumber[2].innerHTML = '00';
+      listBoxNumber[3].innerHTML = '00';
+
       // Khi hết thời gian, dừng đồng hồ
       clearInterval(intervalClock);
     }
   }
+
+  updateClock();
 
   // Gọi hàm cập nhật đồng hồ mỗi giây
   const intervalClock = setInterval(updateClock, 1000);
