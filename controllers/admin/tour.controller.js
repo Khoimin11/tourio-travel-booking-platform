@@ -1,4 +1,5 @@
 const moment = require("moment");
+const slugify = require("slugify");
 const Category = require("../../models/category.model");
 const City = require("../../models/city.model");
 const Tour = require("../../models/tour.model");
@@ -39,6 +40,138 @@ module.exports.list = async (req, res) => {
   res.render("admin/pages/tour-list", {
     pageTitle: "Quản lý tour",
     tourList: tourList
+  })
+}
+
+module.exports.list = async (req, res) => {
+  const find = {
+    deleted: false
+  };
+
+  if(req.query.status) {
+    find.status = req.query.status;
+  }
+
+  if(req.query.createdBy) {
+    find.createdBy = req.query.createdBy;
+  }
+
+  if(req.query.category) {
+    find.category = req.query.category;
+  }
+
+  if(req.query.priceRange) {
+    switch (req.query.priceRange) {
+      case "under-2000000":
+        find.priceNewAdult = { $lt: 2000000 };
+        break;
+      case "2000000-4000000":
+        find.priceNewAdult = {
+          $gte: 2000000,
+          $lt: 4000000
+        };
+        break;
+      case "4000000-8000000":
+        find.priceNewAdult = {
+          $gte: 4000000,
+          $lt: 8000000
+        };
+        break;
+      case "over-8000000":
+        find.priceNewAdult = { $gte: 8000000 };
+        break;
+    }
+  }
+
+  const dateFilter = {};
+
+  if(req.query.startDate) {
+    dateFilter.$gte = moment(req.query.startDate).startOf("date").toDate();
+  }
+
+  if(req.query.endDate) {
+    dateFilter.$lte = moment(req.query.endDate).endOf("date").toDate();
+  }
+
+  if(Object.keys(dateFilter).length > 0) {
+    find.createdAt = dateFilter;
+  }
+
+  if(req.query.keyword) {
+    const keyword = slugify(req.query.keyword, {
+      lower: true
+    });
+    find.slug = new RegExp(keyword, "i");
+  }
+
+  const limitItems = 9;
+  let page = 1;
+  if(req.query.page) {
+    const currentPage = parseInt(req.query.page);
+    if(currentPage > 0) {
+      page = currentPage;
+    }
+  }
+
+  const totalRecord = await Tour.countDocuments(find);
+  const totalPage = Math.ceil(totalRecord / limitItems);
+  if(totalPage === 0) {
+    page = 1;
+  } else if(page > totalPage) {
+    page = totalPage;
+  }
+
+  const skip = totalRecord > 0 ? (page - 1) * limitItems : 0;
+  const pagination = {
+    currentPage: page,
+    skip: skip,
+    totalRecord: totalRecord,
+    totalPage: totalPage
+  };
+
+  const tourList = await Tour
+    .find(find)
+    .sort({
+      position: "desc"
+    })
+    .limit(limitItems)
+    .skip(skip)
+
+  for (const item of tourList) {
+    if(item.createdBy) {
+      const infoAccountCreated = await AccountAdmin.findOne({
+        _id: item.createdBy
+      })
+      item.createdByFullName = infoAccountCreated ? infoAccountCreated.fullName : "";
+    }
+
+    if(item.updatedBy) {
+      const infoAccountUpdated = await AccountAdmin.findOne({
+        _id: item.updatedBy
+      })
+      item.updatedByFullName = infoAccountUpdated ? infoAccountUpdated.fullName : "";
+    }
+
+    item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
+    item.updatedAtFormat = moment(item.updatedAt).format("HH:mm - DD/MM/YYYY");
+  }
+
+  const accountAdminList = await AccountAdmin
+    .find({})
+    .select("id fullName");
+
+  const categoryList = await Category
+    .find({
+      deleted: false
+    })
+    .select("id name");
+
+  res.render("admin/pages/tour-list", {
+    pageTitle: "Quản lý tour",
+    tourList: tourList,
+    accountAdminList: accountAdminList,
+    categoryList: categoryList,
+    pagination: pagination
   })
 }
 

@@ -9,10 +9,10 @@ block main
       .inner-item.inner-label
         <i class="fa-solid fa-filter"></i> Bộ lọc
       .inner-item.inner-date
-        input(type="date")
+        input(type="date" filter-start-date)
         span -
-        input(type="date")
-      .inner-item.inner-reset
+        input(type="date" filter-end-date)
+      .inner-item.inner-reset(filter-reset)
         <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
   //- End Section 4
 
@@ -28,7 +28,7 @@ block main
           button Áp dụng
       .inner-search
         <i class="fa-solid fa-magnifying-glass"></i>
-        input(type="text" placeholder="Tìm kiếm")
+        input(type="text" placeholder="Tìm kiếm" search)
   //- End Section 5
 
   //- Section 6
@@ -60,9 +60,11 @@ block main
 
   //- Section 7
   .section-7
-    span(class="inner-label") Hiển thị 1 - 9 của 78
-    select(class="inner-pagination")
-      option Trang 1
-      option Trang 2
-      option Trang 3
+    - const startRecord = pagination.totalRecord > 0 ? pagination.skip + 1 : 0
+    - const endRecord = pagination.skip + contactList.length
+    span(class="inner-label") Hiển thị #{startRecord} - #{endRecord} của #{pagination.totalRecord}
+    if pagination.totalPage > 0
+      select(class="inner-pagination" pagination)
+        - for (let i = 1; i <= pagination.totalPage; i++)
+          option(value=i, selected=(i === pagination.currentPage)) Trang #{i}
   //- End Section 7

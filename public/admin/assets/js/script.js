@@ -1351,6 +1351,98 @@ if(filterCreatedBy) {
 }
 // End Filter Created By
 
+// Filter Category
+const filterCategory = document.querySelector("[filter-category]");
+if(filterCategory) {
+  const url = new URL(window.location.href);
+
+  filterCategory.addEventListener("change", () => {
+    const value = filterCategory.value;
+    if(value) {
+      url.searchParams.set("category", value);
+    } else {
+      url.searchParams.delete("category");
+    }
+
+    window.location.href = url.href;
+  })
+
+  const valueCurrent = url.searchParams.get("category");
+  if(valueCurrent) {
+    filterCategory.value = valueCurrent;
+  }
+}
+// End Filter Category
+
+// Filter Price Range
+const filterPriceRange = document.querySelector("[filter-price-range]");
+if(filterPriceRange) {
+  const url = new URL(window.location.href);
+
+  filterPriceRange.addEventListener("change", () => {
+    const value = filterPriceRange.value;
+    if(value) {
+      url.searchParams.set("priceRange", value);
+    } else {
+      url.searchParams.delete("priceRange");
+    }
+
+    window.location.href = url.href;
+  })
+
+  const valueCurrent = url.searchParams.get("priceRange");
+  if(valueCurrent) {
+    filterPriceRange.value = valueCurrent;
+  }
+}
+// End Filter Price Range
+
+// Filter Payment Method
+const filterPaymentMethod = document.querySelector("[filter-payment-method]");
+if(filterPaymentMethod) {
+  const url = new URL(window.location.href);
+
+  filterPaymentMethod.addEventListener("change", () => {
+    const value = filterPaymentMethod.value;
+    if(value) {
+      url.searchParams.set("paymentMethod", value);
+    } else {
+      url.searchParams.delete("paymentMethod");
+    }
+
+    window.location.href = url.href;
+  })
+
+  const valueCurrent = url.searchParams.get("paymentMethod");
+  if(valueCurrent) {
+    filterPaymentMethod.value = valueCurrent;
+  }
+}
+// End Filter Payment Method
+
+// Filter Payment Status
+const filterPaymentStatus = document.querySelector("[filter-payment-status]");
+if(filterPaymentStatus) {
+  const url = new URL(window.location.href);
+
+  filterPaymentStatus.addEventListener("change", () => {
+    const value = filterPaymentStatus.value;
+    if(value) {
+      url.searchParams.set("paymentStatus", value);
+    } else {
+      url.searchParams.delete("paymentStatus");
+    }
+
+    window.location.href = url.href;
+  })
+
+  const valueCurrent = url.searchParams.get("paymentStatus");
+  if(valueCurrent) {
+    filterPaymentStatus.value = valueCurrent;
+  }
+}
+// End Filter Payment Status
+
 // Filter Start Date
 const filterStartDate = document.querySelector("[filter-start-date]");
 if(filterStartDate) {
