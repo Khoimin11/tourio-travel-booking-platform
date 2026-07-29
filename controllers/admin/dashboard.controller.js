@@ -1,5 +1,7 @@
 const AccountAdmin = require("../../models/account-admin.model");
 const Order = require("../../models/order.model");
+const moment = require("moment");
+const variableConfig = require("../../config/variable");
 
 module.exports.dashboard = async (req, res) => {
   // Section 1
@@ -25,9 +27,32 @@ module.exports.dashboard = async (req, res) => {
   }, 0);
   // End Section 1
 
+  // Section 3
+  const orderNewestList = await Order.find({
+    deleted: false
+  })
+    .sort({
+      createdAt: "desc"
+    })
+    .limit(5);
+
+  for (const orderDetail of orderNewestList) {
+    const paymentMethod = variableConfig.paymentMethod.find(item => item.value == orderDetail.paymentMethod);
+    const paymentStatus = variableConfig.paymentStatus.find(item => item.value == orderDetail.paymentStatus);
+    const status = variableConfig.orderStatus.find(item => item.value == orderDetail.status);
+
+    orderDetail.paymentMethodName = paymentMethod ? paymentMethod.label : "";
+    orderDetail.paymentStatusName = paymentStatus ? paymentStatus.label : "";
+    orderDetail.statusName = status ? status.label : "";
+    orderDetail.createdAtTime = moment(orderDetail.createdAt).format("HH:mm");
+    orderDetail.createdAtDate = moment(orderDetail.createdAt).format("DD/MM/YYYY");
+  }
+  // End Section 3
+
   res.render("admin/pages/dashboard", {
     pageTitle: "Tổng quan",
-    overview: overview
+    overview: overview,
+    orderNewestList: orderNewestList
   })
 }
 
