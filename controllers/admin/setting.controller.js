@@ -189,6 +189,24 @@ module.exports.roleList = async (req, res) => {
   })
 }
 
+module.exports.roleList = async (req, res) => {
+  const find = {
+    deleted: false
+  };
+
+  if(req.query.keyword) {
+    const keyword = req.query.keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    find.name = new RegExp(keyword, "i");
+  }
+
+  const roleList = await Role.find(find)
+
+  res.render("admin/pages/setting-role-list", {
+    pageTitle: "Nhóm quyền",
+    roleList: roleList
+  })
+}
+
 module.exports.roleCreate = async (req, res) => {
   res.render("admin/pages/setting-role-create", {
     pageTitle: "Tạo nhóm quyền",
