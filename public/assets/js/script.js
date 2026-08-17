@@ -117,6 +117,7 @@ if(boxUserSection1) {
 const clockExpire = document.querySelector("[clock-expire]");
 if(clockExpire) {
   const expireDateTimeString = clockExpire.getAttribute("clock-expire");
+  let intervalClock = null;
 
   // Chuyển đổi chuỗi thời gian thành đối tượng Date
   const expireDateTime = new Date(expireDateTimeString);
@@ -155,15 +156,17 @@ if(clockExpire) {
       listBoxNumber[2].innerHTML = '00';
       listBoxNumber[3].innerHTML = '00';
 
-      // Khi hết thời gian, dừng đồng hồ
-      clearInterval(intervalClock);
+      // Khi hết thời gian, dừng đồng hồ nếu interval đã được tạo
+      if(intervalClock) {
+        clearInterval(intervalClock);
+      }
     }
   }
 
   updateClock();
 
   // Gọi hàm cập nhật đồng hồ mỗi giây
-  const intervalClock = setInterval(updateClock, 1000);
+  intervalClock = setInterval(updateClock, 1000);
 }
 // End Clock Expire
 
