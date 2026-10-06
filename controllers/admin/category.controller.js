@@ -50,38 +50,29 @@ module.exports.list = async (req, res) => {
   }
   // Hết Tìm kiếm
 
-  // Phân trang
-  const limitItems = 3;
-  let page = 1;
-  if(req.query.page) {
-    const currentPage = parseInt(req.query.page);
-    if(currentPage > 0) {
-      page = currentPage;
-    }
-  }
-  const totalRecord = await Category.countDocuments(find);
-  const totalPage = Math.ceil(totalRecord/limitItems);
-  if(totalPage === 0) {
-    page = 1;
-  } else if(page > totalPage) {
-    page = totalPage;
-  }
-  const skip = totalRecord > 0 ? (page - 1) * limitItems : 0;
-  const pagination = {
-    currentPage: page,
-    skip: skip,
-    totalRecord: totalRecord,
-    totalPage: totalPage
-  };
-  // Hết Phân trang
-  
-  const categoryList = await Category
+  let categoryList = await Category
     .find(find)
     .sort({
       position: "desc"
     })
-    .limit(limitItems)
-    .skip(skip)
+
+  // Khi lọc danh mục con, giữ lại các danh mục cha để hiển thị đúng cây
+  if(Object.keys(find).length > 1 && categoryList.length > 0) {
+    const allCategories = await Category.find({ deleted: false })
+      .sort({ position: "desc" });
+    const categoriesById = new Map(allCategories.map(item => [item.id, item]));
+    const visibleIds = new Set(categoryList.map(item => item.id));
+
+    for (const item of categoryList) {
+      let parent = categoriesById.get(item.parent);
+      while(parent && !visibleIds.has(parent.id)) {
+        visibleIds.add(parent.id);
+        parent = categoriesById.get(parent.parent);
+      }
+    }
+
+    categoryList = allCategories.filter(item => visibleIds.has(item.id));
+  }
 
   for (const item of categoryList) {
     if(item.createdBy) {
@@ -110,9 +101,8 @@ module.exports.list = async (req, res) => {
 
   res.render("admin/pages/category-list", {
     pageTitle: "Quản lý danh mục",
-    categoryList: categoryList,
-    accountAdminList: accountAdminList,
-    pagination: pagination
+    categoryList: categoryHelper.flattenCategoryList(categoryList),
+    accountAdminList: accountAdminList
   })
 }
 

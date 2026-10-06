@@ -50,13 +50,14 @@ block main
 
   //- Section 6
   .section-6
-    .table-2
+    .table-2.table-category
       table
         thead
           tr
-            th(class="inner-center")
-              input(type="checkbox" class="inner-check" check-all)
-            th Tên danh mục
+            th
+              .inner-category
+                input(type="checkbox" class="inner-check" check-all)
+                span Tên danh mục
             th Ảnh đại diện
             th(class="inner-center") Vị trí
             th(class="inner-center") Trạng thái
@@ -64,11 +65,13 @@ block main
             th Cập nhật bởi
             th Hành động
         tbody
-          each item in categoryList
+          each row in categoryList
+            - const item = row.item
             tr
-              td(class="inner-center")
-                input(type="checkbox" class="inner-check" check-item=item.id)
-              td #{item.name}
+              td
+                .inner-category(style=`padding-left: ${row.depth * 32}px`)
+                  input(type="checkbox" class="inner-check" check-item=item.id)
+                  span #{item.name}
               td
                 img(src=item.avatar class="inner-avatar")
               td(class="inner-center") #{item.position}
@@ -95,14 +98,3 @@ block main
                     data-api=`/${pathAdmin}/category/delete/${item.id}`
                   ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
-
-  //- Section 7
-  .section-7
-    - const startRecord = pagination.totalRecord > 0 ? pagination.skip + 1 : 0
-    - const endRecord = pagination.skip + categoryList.length
-    span(class="inner-label") Hiển thị #{startRecord} - #{endRecord} của #{pagination.totalRecord}
-    if pagination.totalPage > 0
-      select(class="inner-pagination" pagination)
-        - for (let i = 1; i <= pagination.totalPage; i++)
-          option(value=i, selected=(i === pagination.currentPage)) Trang #{i}
-  //- End Section 7

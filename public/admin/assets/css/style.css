@@ -1146,6 +1146,32 @@ a {
   color: var(--color-text);
   margin-top: 3px;
 }
+.table-category {
+  max-height: 65vh;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.table-category table {
+  overflow: visible;
+}
+
+.table-category thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table-category .inner-category {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  white-space: nowrap;
+}
+
+.table-category .inner-check {
+  flex-shrink: 0;
+}
 /* End .table-2 */
 
 /* Section 7 */

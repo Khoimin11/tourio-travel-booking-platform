@@ -23,6 +23,26 @@ const buildCategoryTree = (categories, parentId = "") => {
 module.exports.buildCategoryTree = buildCategoryTree;
 // Hết Lấy cây danh mục
 
+// Sắp xếp danh sách theo thứ tự cha - con, giữ nguyên thông tin danh mục
+module.exports.flattenCategoryList = (categories) => {
+  const result = [];
+  const ids = new Set(categories.map(item => item.id));
+  const visited = new Set();
+
+  const append = (item, depth = 0) => {
+    if(visited.has(item.id)) return;
+    visited.add(item.id);
+    result.push({ item, depth });
+    categories.filter(child => child.parent === item.id)
+      .forEach(child => append(child, depth + 1));
+  };
+
+  categories.filter(item => !ids.has(item.parent)).forEach(item => append(item));
+  // Giữ các danh mục có quan hệ cha - con bị vòng lặp trong danh sách
+  categories.forEach(item => append(item));
+  return result;
+};
+
 // Lấy tất cả id của danh mục cha + con
 module.exports.getAllSubcategoryIds = async (parentId) => {
   // Mảng lưu tất cả ID của danh mục (gồm danh mục cha và các danh mục con)
