@@ -1,3 +1,17 @@
+const passwordToggle = document.querySelector("[password-toggle]");
+if(passwordToggle) {
+  const passwordInput = document.querySelector("#password");
+  passwordToggle.addEventListener("click", () => {
+    const showPassword = passwordInput.type === "password";
+    passwordInput.type = showPassword ? "text" : "password";
+    passwordToggle.classList.toggle("is-visible", showPassword);
+    const label = showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu";
+    passwordToggle.setAttribute("aria-label", label);
+    passwordToggle.setAttribute("title", label);
+    passwordToggle.setAttribute("aria-pressed", String(showPassword));
+  });
+}
+
 // Login Form
 const loginForm = document.querySelector("#login-form");
 if(loginForm) {

@@ -108,6 +108,42 @@ a {
   color: #A6A6A6;
 }
 
+.form-account .inner-password {
+  position: relative;
+}
+
+.form-account .inner-password .inner-control {
+  padding-right: 56px;
+}
+
+.form-account .inner-password-toggle {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.form-account .inner-password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+}
+
+.form-account .inner-eye-slash {
+  display: none;
+}
+
+.form-account .inner-password-toggle.is-visible .inner-eye-slash {
+  display: block;
+}
+
 .form-account .inner-meta {
   margin-bottom: 30px;
   display: flex;
