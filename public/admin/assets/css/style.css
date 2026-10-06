@@ -856,7 +856,8 @@ a {
 }
 
 .section-4 .inner-item select,
-.section-4 .inner-item input[type="date"] {
+.section-4 .inner-item input[type="date"],
+.section-4 .inner-item .date-picker-input {
   font-weight: 700;
   font-size: 14px;
   color: var(--color-text);
@@ -865,7 +866,8 @@ a {
   cursor: pointer;
 }
 
-.section-4 .inner-item input[type="date"] {
+.section-4 .inner-item input[type="date"],
+.section-4 .inner-item .date-picker-input {
   width: 110px;
 }
 

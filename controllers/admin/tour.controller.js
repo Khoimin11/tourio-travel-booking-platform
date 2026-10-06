@@ -204,8 +204,8 @@ module.exports.createPost = async (req, res) => {
   if(req.body.position) {
     req.body.position = parseInt(req.body.position);
   } else {
-    const totalRecord = await Tour.countDocuments({});
-    req.body.position = totalRecord + 1;
+    const lastTour = await Tour.findOne({}).sort({ position: -1 }).select("position");
+    req.body.position = (lastTour?.position || 0) + 1;
   }
 
   req.body.createdBy = req.account.id;
@@ -341,8 +341,8 @@ module.exports.editPatch = async (req, res) => {
     if(req.body.position) {
       req.body.position = parseInt(req.body.position);
     } else {
-      const totalRecord = await Tour.countDocuments({});
-      req.body.position = totalRecord + 1;
+      const lastTour = await Tour.findOne({}).sort({ position: -1 }).select("position");
+      req.body.position = (lastTour?.position || 0) + 1;
     }
 
     req.body.updatedBy = req.account.id;
