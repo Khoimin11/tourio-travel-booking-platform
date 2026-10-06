@@ -1,0 +1,22 @@
+mixin pagination(paging)
+  if paging.totalPage > 1
+    nav.box-pagination(aria-label="Phân trang tour")
+      if paging.currentPage > 1
+        a(href=paging.getPageLink(paging.currentPage - 1) aria-label="Trang trước")
+          i.fa-solid.fa-angles-left
+      else
+        span.disabled(aria-disabled="true" aria-label="Trang trước")
+          i.fa-solid.fa-angles-left
+      - for (let page = paging.startPage; page <= paging.endPage; page++)
+        a(
+          href=paging.getPageLink(page)
+          class=page === paging.currentPage ? "active" : ""
+          aria-current=page === paging.currentPage ? "page" : undefined
+          aria-label=`Trang ${page}`
+        ) #{page}
+      if paging.currentPage < paging.totalPage
+        a(href=paging.getPageLink(paging.currentPage + 1) aria-label="Trang sau")
+          i.fa-solid.fa-angles-right
+      else
+        span.disabled(aria-disabled="true" aria-label="Trang sau")
+          i.fa-solid.fa-angles-right

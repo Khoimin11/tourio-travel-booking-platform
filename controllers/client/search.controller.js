@@ -1,6 +1,7 @@
 const Tour = require("../../models/tour.model");
 const moment = require("moment");
 const slugify = require('slugify');
+const paginationHelper = require("../../helpers/pagination.helper");
 
 module.exports.list = async (req, res) => {
   const find = {
@@ -65,11 +66,17 @@ module.exports.list = async (req, res) => {
   }
   // Hết Mức giá
 
+  const totalTour = await Tour.countDocuments(find);
+  const pagination = paginationHelper(totalTour, req);
+
   const tourList = await Tour
     .find(find)
     .sort({
-      position: "desc"
+      position: "desc",
+      _id: "desc"
     })
+    .limit(pagination.limitItems)
+    .skip(pagination.skip)
 
   for(const item of tourList) {
     item.departureDateFormat = moment(item.departureDate).format("DD/MM/YYYY");
@@ -77,6 +84,7 @@ module.exports.list = async (req, res) => {
 
   res.render("client/pages/search", {
     pageTitle: "Kết quả tìm kiếm",
-    tourList: tourList
+    tourList: tourList,
+    pagination: pagination
   });
 }

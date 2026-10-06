@@ -1,5 +1,6 @@
 extends ../layouts/default.pug
 include ../mixins/product-item.pug
+include ../mixins/pagination.pug
 
 block main
 
@@ -10,4 +11,5 @@ block main
       .inner-wrap
         each item in tourList
           +product-item(item)
+      +pagination(pagination)
   // End Section 4

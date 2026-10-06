@@ -3,6 +3,7 @@ const Tour = require("../../models/tour.model");
 const City = require("../../models/city.model");
 const moment = require("moment");
 const categoryHelper = require("../../helpers/category.helper");
+const paginationHelper = require("../../helpers/pagination.helper");
 
 module.exports.list = async (req, res) => {
   // Lấy slug từ params
@@ -61,11 +62,13 @@ module.exports.list = async (req, res) => {
     };
 
     const totalTour = await Tour.countDocuments(find);
+    const pagination = paginationHelper(totalTour, req);
 
     const tourList = await Tour
       .find(find)
       .sort({
-        position: "desc"
+        position: "desc",
+        _id: "desc"
       })
 
     for(const item of tourList) {
@@ -92,10 +95,11 @@ module.exports.list = async (req, res) => {
       pageTitle: "Danh sách tour",
       breadcrumb: breadcrumb,
       category: category,
-      tourList: tourList,
+      tourList: tourList.slice(pagination.skip, pagination.skip + pagination.limitItems),
       totalTour: totalTour,
       cityList: cityList,
-      currentSort: currentSort
+      currentSort: currentSort,
+      pagination: pagination
     });
   } else {
     res.redirect("/");
