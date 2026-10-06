@@ -2322,12 +2322,14 @@ input, button, textarea {
 }
 
 .box-tour-info .inner-content {
-  height: 500px;
+  max-height: 200px;
   overflow: hidden;
+  mask-image: linear-gradient(to bottom, black calc(100% - 50px), transparent);
 }
 
 .box-tour-info.active .inner-content {
-  height: auto;
+  max-height: none;
+  mask-image: none;
 }
 
 .box-tour-info .inner-content p {
