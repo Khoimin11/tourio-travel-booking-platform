@@ -9,9 +9,9 @@ module.exports.cart = async (req, res) => {
 }
 
 module.exports.detail = async (req, res) => {
-  const cart = req.body;
+  const cart = [];
 
-  for(const item of cart) {
+  for(const item of req.body) {
     const tourInfo = await Tour.findOne({
       _id: item.tourId,
       status: "active",
@@ -30,11 +30,8 @@ module.exports.detail = async (req, res) => {
       const city = await City.findOne({
         _id: item.locationFrom
       });
-      item.locationFromName = city.name;
-    } else {
-      // Nếu không lấy được tour thì xóa tour khỏi giỏ hàng
-      const indexItem = cart.findIndex(tour => tour.tourId == item.tourId);
-      cart.splice(indexItem, 1);
+      item.locationFromName = city ? city.name : "";
+      cart.push(item);
     }
   }
 

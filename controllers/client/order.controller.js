@@ -13,6 +13,16 @@ const moment = require("moment");
 
 module.exports.createPost = async (req, res) => {
   try {
+    const items = req.body.items;
+    if(!Array.isArray(items) || items.length === 0 || items.some(item => {
+      if(!item || typeof item.tourId !== "string" || !item.tourId) return true;
+      const quantities = [item.quantityAdult, item.quantityChildren, item.quantityBaby];
+      return quantities.some(value => !Number.isInteger(value) || value < 0) ||
+        quantities.reduce((sum, value) => sum + value, 0) === 0;
+    })) {
+      return res.json({ code: "error", message: "Vui lòng chọn tour và số lượng hành khách hợp lệ!" });
+    }
+    const stockUpdates = [];
     req.body.orderCode = "OD" + gererateHelper.generateRandomNumber(10);
 
     // Danh sách tour
@@ -22,6 +32,10 @@ module.exports.createPost = async (req, res) => {
         status: "active",
         deleted: false
       })
+
+      if(!infoTour) {
+        return res.json({ code: "error", message: "Tour không còn hoạt động, vui lòng chọn lại!" });
+      }
 
       if(infoTour) {
         // Thêm giá
@@ -47,14 +61,18 @@ module.exports.createPost = async (req, res) => {
           return;
         }
 
-        await Tour.updateOne({
-          _id: item.tourId
-        }, {
+        stockUpdates.push({
+          tourId: item.tourId,
           stockAdult: infoTour.stockAdult - item.quantityAdult,
           stockChildren: infoTour.stockChildren - item.quantityChildren,
           stockBaby: infoTour.stockBaby - item.quantityBaby,
         })
       }
+    }
+
+    // Check all tours before changing stock, so a later validation failure has no side effects.
+    for(const { tourId, ...stock } of stockUpdates) {
+      await Tour.updateOne({ _id: tourId }, stock);
     }
 
     // Thanh toán
