@@ -44,22 +44,19 @@ module.exports.flattenCategoryList = (categories) => {
 };
 
 // Lấy tất cả id của danh mục cha + con
-module.exports.getAllSubcategoryIds = async (parentId) => {
+module.exports.getAllSubcategoryIds = async (parentId, activeOnly = true) => {
   // Mảng lưu tất cả ID của danh mục (gồm danh mục cha và các danh mục con)
   const result = [parentId];
 
   // Hàm đệ quy để tìm các danh mục con
   const findChildren = async (currentId) => {
-    // Tìm các danh mục con có parent = currentId, không bị xóa và đang hoạt động
-    const children = await Category
-      .find({
-        parent: currentId,
-        deleted: false,
-        status: "active"
-      });
+    const find = { parent: currentId, deleted: false };
+    if(activeOnly) find.status = "active";
+    const children = await Category.find(find);
 
     // Duyệt qua từng danh mục con tìm được
     for (const child of children) {
+      if(result.includes(child.id)) continue;
       result.push(child.id); // Thêm ID vào danh sách kết quả
       await findChildren(child.id); // Gọi đệ quy để tìm danh mục con của danh mục này
     }

@@ -57,7 +57,8 @@ module.exports.list = async (req, res) => {
   }
 
   if(req.query.category) {
-    find.category = req.query.category;
+    const categoryIds = await categoryHelper.getAllSubcategoryIds(req.query.category, false);
+    find.category = { $in: categoryIds };
   }
 
   if(req.query.priceRange) {
