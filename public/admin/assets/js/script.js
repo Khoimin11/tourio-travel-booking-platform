@@ -1005,7 +1005,8 @@ if(settingAccountAdminEditForm) {
       }
       formData.append("avatar", avatar);
 
-      fetch(`/${pathAdmin}/setting/account-admin/edit/${id}`, {
+      const editApi = settingAccountAdminEditForm.getAttribute("data-api") || `/${pathAdmin}/setting/account-admin/edit/${id}`;
+      fetch(editApi, {
         method: "PATCH",
         body: formData,
       })
@@ -1016,7 +1017,9 @@ if(settingAccountAdminEditForm) {
           }
 
           if(data.code == "success") {
-            window.location.reload();
+            const returnUrl = settingAccountAdminEditForm.getAttribute("data-success-url");
+            if(returnUrl) window.location.href = returnUrl;
+            else window.location.reload();
           }
         })
     })

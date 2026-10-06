@@ -71,8 +71,16 @@ block main
                   .badge.badge-red Tạm dừng
               td
                 .inner-buttons
-                  button(class="inner-edit") <i class="fa-regular fa-pen-to-square"></i>
-                  button(class="inner-delete") <i class="fa-regular fa-trash-can"></i>
+                  a(class="inner-edit" href=`/${pathAdmin}/user/edit/${item.id}` title="Chỉnh sửa người dùng" aria-label="Chỉnh sửa người dùng") <i class="fa-regular fa-pen-to-square"></i>
+                  button(
+                    type="button"
+                    class="inner-delete"
+                    title="Xóa người dùng"
+                    aria-label="Xóa người dùng"
+                    button-delete
+                    data-api=`/${pathAdmin}/user/delete/${item.id}`
+                    data-confirm="Bạn có chắc muốn xóa người dùng này?"
+                  ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7

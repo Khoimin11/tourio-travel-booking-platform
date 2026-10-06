@@ -1,10 +1,10 @@
 extends ../layouts/default.pug
 
 block main
-  h1.box-title Chỉnh sửa tài khoản quản trị
+  h1.box-title= pageTitle
 
   .section-8
-    form#setting-account-admin-edit-form
+    form#setting-account-admin-edit-form(data-api=editApi data-success-url=returnUrl)
       .inner-group(style="display: none;")
         label(class="inner-label" for="id") Id
         input(type="text" id="id" name="id" value=accountAdminDetail.id)
@@ -50,7 +50,7 @@ block main
           ) Tạm dừng
       .inner-group
         label(class="inner-label" for="password") Mật khẩu
-        input(type="text" id="password" name="password")
+        input(type="password" id="password" name="password" autocomplete="new-password" placeholder="Để trống để giữ mật khẩu hiện tại")
       .inner-group.inner-two-col
         label(class="inner-label" for="avatar") Ảnh đại diện
         div(class="inner-upload-image" image-default=accountAdminDetail.avatar)
@@ -58,4 +58,4 @@ block main
       .inner-button.inner-two-col
         button Cập nhật
     .inner-back
-      a(href=`/${pathAdmin}/setting/account-admin/list`) Quay lại danh sách
+      a(href=returnUrl || `/${pathAdmin}/setting/account-admin/list`) Quay lại danh sách

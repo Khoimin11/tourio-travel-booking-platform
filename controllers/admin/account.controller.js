@@ -16,7 +16,8 @@ module.exports.loginPost = async (req, res) => {
   const { email, password, rememberPassword } = req.body;
 
   const existAccount = await AccountAdmin.findOne({
-    email: email
+    email: email,
+    deleted: false
   });
 
   if(!existAccount) {
