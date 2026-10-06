@@ -3,7 +3,7 @@ footer.footer
   - const categoryDomestic = categoryList.find(item => item.name === "Tour Trong Nước")
   - const categoryInternational = categoryList.find(item => item.name === "Tour Nước Ngoài")
   .container
-    .inner-top
+    .inner-top#newsletter
       h2.inner-title Đăng ký ngay để không bỏ lỡ các chương trình của chúng tôi
       form#email-form.inner-form(action="#")
         input#email-input(
@@ -24,7 +24,7 @@ footer.footer
           li
             a(href="#") Tin Tức
           li
-            a(href="#") Liên Hệ
+            a(href="#newsletter") Liên Hệ
       nav.inner-socials
         ul
           li

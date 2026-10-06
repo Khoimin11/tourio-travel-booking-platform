@@ -3,6 +3,10 @@ const buttonMenuMobile = document.querySelector(".header .inner-menu-mobile");
 if(buttonMenuMobile) {
   const menu = document.querySelector(".header .inner-menu");
 
+  menu.querySelector('a[href="#newsletter"]').addEventListener("click", () => {
+    menu.classList.remove("active");
+  });
+
   // Click vào button mở menu
   buttonMenuMobile.addEventListener("click", () => {
     menu.classList.add("active");
@@ -25,6 +29,29 @@ if(buttonMenuMobile) {
   });
 }
 // End Menu Mobile
+
+// Highlight newsletter after scrolling into view
+const newsletter = document.querySelector("#newsletter");
+if(newsletter) {
+  const observer = new IntersectionObserver(([entry]) => {
+    if(entry.intersectionRatio < 0.5) return;
+    observer.disconnect();
+    newsletter.querySelector("#email-input").focus({ preventScroll: true });
+    newsletter.getAnimations().forEach(animation => animation.cancel());
+    newsletter.animate([
+      { boxShadow: "0 0 0 0 rgba(170, 125, 255, 0)" },
+      { boxShadow: "0 0 24px 8px rgba(170, 125, 255, 0.7)" },
+      { boxShadow: "0 0 0 0 rgba(170, 125, 255, 0)" }
+    ], { duration: 900, iterations: 2, easing: "ease-in-out" });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('a[href="#newsletter"]').forEach(link => {
+    link.addEventListener("click", () => {
+      observer.disconnect();
+      observer.observe(newsletter);
+    });
+  });
+}
 
 // Box Address Section 1
 const boxAddressSection1 = document.querySelector(".section-1 .inner-form .inner-box.inner-address");
