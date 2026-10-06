@@ -1333,11 +1333,13 @@ if(alertTime) {
 // End Alert
 
 // Button Delete
-const listButtonDelete = document.querySelectorAll("[button-delete]");
+const listButtonDelete = document.querySelectorAll("[button-delete], [button-undo]");
 if(listButtonDelete.length > 0) {
   listButtonDelete.forEach(button => {
     button.addEventListener("click", () => {
       const dataApi = button.getAttribute("data-api");
+      const confirmMessage = button.getAttribute("data-confirm");
+      if(confirmMessage && !confirm(confirmMessage)) return;
       
       fetch(dataApi, {
         method: "PATCH"
@@ -1584,6 +1586,7 @@ if(changeMulti) {
     const option = select.value;
     const listInputChecked = document.querySelectorAll("[check-item]:checked");
     if(option && listInputChecked.length > 0) {
+      if(option === "delete-destroy" && !confirm("Xóa vĩnh viễn các tour đã chọn? Thao tác này không thể hoàn tác.")) return;
       const ids = [];
       listInputChecked.forEach(inputChecked => {
         const id = inputChecked.getAttribute("check-item");
@@ -1665,7 +1668,7 @@ if(pagination) {
 
   // Hiển thị lựa chọn mặc định
   const valueCurrent = url.searchParams.get("page");
-  if(valueCurrent) {
+  if(valueCurrent && Array.from(pagination.options).some(option => option.value === valueCurrent)) {
     pagination.value = valueCurrent;
   }
 }

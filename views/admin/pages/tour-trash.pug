@@ -2,7 +2,7 @@ extends ../layouts/default.pug
 
 block main
   if (permissions.includes("tour-view"))
-    h1.box-title Quản lý tour
+    h1.box-title Thùng rác tour
 
     //- Section 4
     .section-4
@@ -42,15 +42,13 @@ block main
     //- Section 5
     .section-5
       .inner-wrap
-        .inner-change-status
+        .inner-change-status(change-multi data-api=`/${pathAdmin}/tour/trash/change-multi`)
           .inner-item
             select
               option(value="") -- Hành động --
-              if (permissions.includes("tour-edit"))
-                option(value="") Hoạt động
-                option(value="") Dừng hoạt động
-              if (permissions.includes("tour-delete"))
-                option(value="") Xóa
+              if (permissions.includes("tour-trash"))
+                option(value="undo") Khôi phục
+                option(value="delete-destroy") Xóa vĩnh viễn
           .inner-item
             button Áp dụng
         .inner-search
@@ -71,7 +69,7 @@ block main
           thead
             tr
               th(class="inner-center")
-                input(type="checkbox" class="inner-check")
+                input(type="checkbox" class="inner-check" check-all)
               th Tên tour
               th Ảnh đại diện
               th(style="width: 130px") Giá
@@ -85,7 +83,7 @@ block main
             each item in tourList
               tr
                 td(class="inner-center")
-                  input(type="checkbox" class="inner-check")
+                  input(type="checkbox" class="inner-check" check-item=item.id)
                 td #{item.name}
                 td
                   img(src=item.avatar class="inner-avatar")
@@ -111,24 +109,33 @@ block main
                   div.inner-time #{item.updatedAtFormat}
                 td
                   .inner-buttons
-                    if (permissions.includes("tour-edit"))
-                      a(
-                        href=`/${pathAdmin}/tour/edit/${item.id}`
-                        class="inner-edit"
-                      ) <i class="fa-regular fa-pen-to-square"></i>
-                    if (permissions.includes("tour-delete"))
+                    if (permissions.includes("tour-trash"))
                       button(
+                        type="button"
+                        class="inner-edit"
+                        title="Khôi phục tour"
+                        aria-label="Khôi phục tour"
+                        button-undo
+                        data-api=`/${pathAdmin}/tour/undo/${item.id}`
+                      ) <i class="fa-solid fa-rotate-left"></i>
+                      button(
+                        type="button"
                         class="inner-delete"
+                        title="Xóa vĩnh viễn"
+                        aria-label="Xóa vĩnh viễn tour"
                         button-delete
-                        data-api=`/${pathAdmin}/tour/delete/${item.id}`
+                        data-confirm="Xóa vĩnh viễn tour này? Thao tác này không thể hoàn tác."
+                        data-api=`/${pathAdmin}/tour/delete-destroy/${item.id}`
                       ) <i class="fa-regular fa-trash-can"></i>
     //- End Section 6
 
     //- Section 7
     .section-7
-      span(class="inner-label") Hiển thị 1 - 9 của 78
-      select(class="inner-pagination")
-        option Trang 1
-        option Trang 2
-        option Trang 3
+      - const startRecord = pagination.totalRecord > 0 ? pagination.skip + 1 : 0
+      - const endRecord = pagination.skip + tourList.length
+      span(class="inner-label") Hiển thị #{startRecord} - #{endRecord} của #{pagination.totalRecord}
+      if pagination.totalPage > 0
+        select(class="inner-pagination" pagination)
+          - for (let i = 1; i <= pagination.totalPage; i++)
+            option(value=i, selected=(i === pagination.currentPage)) Trang #{i}
     //- End Section 7

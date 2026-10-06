@@ -250,25 +250,35 @@ module.exports.trash = async (req, res) => {
     deleted: true
   };
 
+  const limitItems = 5;
+  const totalRecord = await Tour.countDocuments(find);
+  const totalPage = Math.ceil(totalRecord / limitItems);
+  const requestedPage = parseInt(req.query.page) || 1;
+  const page = Math.max(1, Math.min(requestedPage, totalPage || 1));
+  const skip = (page - 1) * limitItems;
+  const pagination = { currentPage: page, skip, totalRecord, totalPage };
+
   const tourList = await Tour
     .find(find)
     .sort({
       deletedAt: "desc"
     })
+    .limit(limitItems)
+    .skip(skip)
 
   for (const item of tourList) {
     if(item.createdBy) {
       const infoAccountCreated = await AccountAdmin.findOne({
         _id: item.createdBy
       })
-      item.createdByFullName = infoAccountCreated.fullName;
+      item.createdByFullName = infoAccountCreated ? infoAccountCreated.fullName : "";
     }
 
     if(item.deletedBy) {
       const infoAccountDeleted = await AccountAdmin.findOne({
         _id: item.deletedBy
       })
-      item.deletedByFullName = infoAccountDeleted.fullName;
+      item.deletedByFullName = infoAccountDeleted ? infoAccountDeleted.fullName : "";
     }
 
     item.createdAtFormat = moment(item.createdAt).format("HH:mm - DD/MM/YYYY");
@@ -277,7 +287,8 @@ module.exports.trash = async (req, res) => {
 
   res.render("admin/pages/tour-trash", {
     pageTitle: "Thùng rác tour",
-    tourList: tourList
+    tourList: tourList,
+    pagination: pagination
   })
 }
 
@@ -411,6 +422,44 @@ module.exports.deletePatch = async (req, res) => {
   }
 }
 
+module.exports.changeMultiPatch = async (req, res) => {
+  const { option, ids } = req.body || {};
+  if(!["active", "inactive", "delete"].includes(option) || !Array.isArray(ids) ||
+    ids.length === 0 || !ids.every(id => typeof id === "string" && id.trim())) {
+    return res.json({ code: "error", message: "Vui lòng chọn hành động và tour hợp lệ!" });
+  }
+
+  const permission = option === "delete" ? "tour-delete" : "tour-edit";
+  if(!req.permissions.includes(permission)) {
+    return res.json({ code: "error", message: "Không có quyền sử dụng tính năng này!" });
+  }
+
+  try {
+    const update = { updatedBy: req.account.id };
+    if(option === "delete") {
+      update.deleted = true;
+      update.deletedBy = req.account.id;
+      update.deletedAt = new Date();
+    } else {
+      update.status = option;
+    }
+
+    const result = await Tour.updateMany({
+      _id: { $in: ids },
+      deleted: false
+    }, { $set: update });
+
+    if(result.matchedCount === 0) {
+      return res.json({ code: "error", message: "Không tìm thấy tour đã chọn trong danh sách!" });
+    }
+
+    req.flash("success", option === "delete" ? "Đã chuyển tour vào thùng rác!" : "Đổi trạng thái tour thành công!");
+    res.json({ code: "success" });
+  } catch (error) {
+    res.json({ code: "error", message: "Không thể cập nhật các tour đã chọn!" });
+  }
+};
+
 module.exports.undoPatch = async (req, res) => {
   if(!req.permissions.includes("tour-trash")) {
     res.json({
@@ -423,11 +472,17 @@ module.exports.undoPatch = async (req, res) => {
   try {
     const id = req.params.id;
     
-    await Tour.updateOne({
-      _id: id
+    const result = await Tour.updateOne({
+      _id: id,
+      deleted: true
     }, {
-      deleted: false
+      $set: { deleted: false, updatedBy: req.account.id },
+      $unset: { deletedBy: "", deletedAt: "" }
     })
+
+    if(result.matchedCount === 0) {
+      return res.json({ code: "error", message: "Tour không còn trong thùng rác!" });
+    }
 
     req.flash("success", "Khôi phục tour thành công!");
 
@@ -454,9 +509,14 @@ module.exports.deleteDestroyPatch = async (req, res) => {
   try {
     const id = req.params.id;
     
-    await Tour.deleteOne({
-      _id: id
+    const result = await Tour.deleteOne({
+      _id: id,
+      deleted: true
     })
+
+    if(result.deletedCount === 0) {
+      return res.json({ code: "error", message: "Tour không còn trong thùng rác!" });
+    }
 
     req.flash("success", "Đã xóa vĩnh viễn tour thành công!");
 
@@ -483,20 +543,28 @@ module.exports.trashChangeMultiPatch = async (req, res) => {
   try {
     const { option, ids } = req.body;
 
+    if(!["undo", "delete-destroy"].includes(option) || !Array.isArray(ids) ||
+      ids.length === 0 || !ids.every(id => typeof id === "string" && id.trim())) {
+      return res.json({ code: "error", message: "Vui lòng chọn hành động và tour hợp lệ!" });
+    }
+
     switch (option) {
       case "undo":
         await Tour.updateMany({
-          _id: { $in: ids }
+          _id: { $in: ids },
+          deleted: true
         }, {
-          deleted: false
+          $set: { deleted: false, updatedBy: req.account.id },
+          $unset: { deletedBy: "", deletedAt: "" }
         });
         req.flash("success", "Khôi phục thành công!");
         break;
       case "delete-destroy":
         await Tour.deleteMany({
-          _id: { $in: ids }
+          _id: { $in: ids },
+          deleted: true
         });
-        req.flash("success", "Xóa viễn viễn thành công!");
+        req.flash("success", "Xóa vĩnh viễn thành công!");
         break;
     }
 
