@@ -2,13 +2,13 @@
 if(typeof flatpickr !== "undefined") {
   document.querySelectorAll('input[type="date"], input[type="datetime-local"]').forEach(input => {
     const withTime = input.type === "datetime-local";
-    input.placeholder = withTime ? "DD/MM/YYYY HH:mm" : "DD/MM/YYYY";
+    if(!input.placeholder) input.placeholder = withTime ? "DD/MM/YYYY HH:mm" : "DD/MM/YYYY";
     flatpickr(input, {
       locale: "vn",
       dateFormat: withTime ? "Y-m-d\\TH:i" : "Y-m-d",
       altInput: true,
       altFormat: withTime ? "d/m/Y H:i" : "d/m/Y",
-      altInputClass: "date-picker-input",
+      altInputClass: `${input.className} date-picker-input`.trim(),
       enableTime: withTime,
       time_24hr: true,
       disableMobile: true,
