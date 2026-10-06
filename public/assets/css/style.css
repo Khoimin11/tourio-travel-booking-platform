@@ -2877,6 +2877,48 @@ input, button, textarea {
 
 .section-12 .inner-method {
   margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  align-items: start;
+}
+
+.section-12 .inner-method .inner-title-main,
+.section-12 .inner-method .inner-info-bank {
+  grid-column: 1 / -1;
+}
+
+.section-12 .inner-payment-note {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 14px;
+  border: 1px solid #ded2fa;
+  border-radius: 8px;
+  background-color: #f6f2ff;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.section-12 .inner-payment-note p {
+  margin: 0 0 8px;
+}
+
+.section-12 .inner-payment-note ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 767.98px) {
+  .section-12 .inner-method {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+
+  .section-12 .inner-payment-note {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
 
 .section-12 .inner-method .inner-list {

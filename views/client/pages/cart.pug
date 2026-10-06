@@ -97,6 +97,21 @@ block main
                   type="radio"
                   )
                 label(for="methodBank") Chuyển khoản ngân hàng
+            aside.inner-payment-note(payment-note="vnpay" hidden)
+              p Use the following test information when checking the VNPay payment flow in the demo environment:
+              ul
+                li Bank: #[code NCB]
+                li Card number: #[code 9704198526191432198]
+                li Card holder: #[code NGUYEN VAN A]
+                li Issue date: #[code 07/15]
+                li OTP password: #[code 123456]
+            aside.inner-payment-note(payment-note="zalopay" hidden)
+              p Use the following test information when checking the ZaloPay payment flow in the demo environment:
+              ul
+                li Valid card number: #[code 9704540000000062]
+                li Card holder: #[code NGUYEN VAN A]
+                li Issue date: #[code 10/18]
+                li Verification OTP: #[code 111111]
             .inner-info-bank
               .inner-title Thông tin chuyển khoản
               .inner-text Ngân hàng : Vietcombank

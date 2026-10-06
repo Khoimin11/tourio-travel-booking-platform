@@ -450,8 +450,15 @@ if(orderForm) {
             if(data.code == "success") {
               // Cập nhật lại giỏ hàng
               let cart = JSON.parse(localStorage.getItem("cart"));
-              cart = cart.filter(item => item.checked == false);
-              localStorage.setItem("cart", JSON.stringify(cart));
+              if(method === "zalopay" || method === "vnpay") {
+                sessionStorage.setItem("onlinePendingOrder", JSON.stringify({
+                  orderId: data.orderId,
+                  tourIds: cart.filter(item => item.checked).map(item => item.tourId)
+                }));
+              } else {
+                cart = cart.filter(item => item.checked == false);
+                localStorage.setItem("cart", JSON.stringify(cart));
+              }
 
               switch (method) {
                 case "money":
@@ -479,16 +486,19 @@ if(orderForm) {
   // List Input Method
   const listInputMethod = orderForm.querySelectorAll("input[name='method']");
   const elementInfoBank = orderForm.querySelector(".inner-info-bank");
+  const paymentNotes = orderForm.querySelectorAll("[payment-note]");
 
+  const updatePaymentInfo = () => {
+    const method = orderForm.querySelector("input[name='method']:checked")?.value;
+    elementInfoBank.classList.toggle("active", method === "bank");
+    paymentNotes.forEach(note => {
+      note.hidden = note.getAttribute("payment-note") !== method;
+    });
+  };
   listInputMethod.forEach(inputMethod => {
-    inputMethod.addEventListener("change", () => {
-      if (inputMethod.value == "bank") {
-        elementInfoBank.classList.add("active");
-      } else {
-        elementInfoBank.classList.remove("active");
-      }
-    })
+    inputMethod.addEventListener("change", updatePaymentInfo);
   })
+  updatePaymentInfo();
   // End List Input Method
 }
 // End Order Form
@@ -663,6 +673,21 @@ if(!cart) {
   localStorage.setItem("cart", JSON.stringify([]));
 }
 // End Initial Cart
+
+// Clear online payment cart items only after confirmed payment.
+const paidOnlineOrder = document.querySelector("[online-paid-order]");
+if(paidOnlineOrder) {
+  try {
+    const pending = JSON.parse(sessionStorage.getItem("onlinePendingOrder"));
+    if(pending?.orderId === paidOnlineOrder.getAttribute("online-paid-order")) {
+      const cartItems = JSON.parse(localStorage.getItem("cart"));
+      localStorage.setItem("cart", JSON.stringify(cartItems.filter(item => !pending.tourIds.includes(item.tourId))));
+      sessionStorage.removeItem("onlinePendingOrder");
+    }
+  } catch (error) {
+    sessionStorage.removeItem("onlinePendingOrder");
+  }
+}
 
 // Mini Cart
 const miniCart = document.querySelector("[mini-cart]");

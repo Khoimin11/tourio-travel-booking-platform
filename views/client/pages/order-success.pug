@@ -1,10 +1,14 @@
 extends ../layouts/default.pug
 
 block main
-  .container
+  .container(online-paid-order=["zalopay", "vnpay"].includes(orderDetail.paymentMethod) && orderDetail.paymentStatus === "paid" ? orderDetail.id : undefined)
     .section-11(style="padding-top: 20px;")
       .inner-wrap
-        h4 Cảm ơn quý khách đã đặt tour! Chúng tôi sẽ liên hệ lại với quý khách trong thời gian sớm nhất.
+        if orderDetail.paymentMethod === "vnpay" && orderDetail.paymentStatus !== "paid"
+          h4 Đơn hàng đang chờ xác nhận thanh toán từ VNPay.
+          a(href=`/order/success?orderId=${orderDetail.id}&phone=${encodeURIComponent(orderDetail.phone)}`) Kiểm tra lại trạng thái thanh toán
+        else
+          h4 Cảm ơn quý khách đã đặt tour! Chúng tôi sẽ liên hệ lại với quý khách trong thời gian sớm nhất.
         .inner-head
           .inner-title Thông tin đơn hàng
         p Mã đơn hàng: #{orderDetail.orderCode}

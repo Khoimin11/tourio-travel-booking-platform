@@ -4,7 +4,8 @@ const City = require("../../models/city.model");
 
 const variableConfig = require("../../config/variable");
 const gererateHelper = require("../../helpers/generate.helper");
-const sortHelper = require("../../helpers/sort.helper");
+const vnpayHelper = require("../../helpers/vnpay.helper");
+const crypto = require("crypto");
 
 const axios = require('axios').default; // npm install axios
 const CryptoJS = require('crypto-js'); // npm install crypto-js
@@ -169,7 +170,7 @@ module.exports.paymentZaloPay = async (req, res) => {
     };
 
     const embed_data = {
-      redirecturl: `${process.env.DOMAIN_WEBSITE}/order/success?orderId=${orderDetail.id}&phone=${orderDetail.phone}`
+      redirecturl: `${req.protocol}://${req.get("host")}/order/payment-zalopay-return?${new URLSearchParams({ orderId: orderDetail.id, phone: orderDetail.phone })}`
     };
 
     const items = [{}];
@@ -191,16 +192,56 @@ module.exports.paymentZaloPay = async (req, res) => {
     const data = config.app_id + "|" + order.app_trans_id + "|" + order.app_user + "|" + order.amount + "|" + order.app_time + "|" + order.embed_data + "|" + order.item;
     order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
 
-    const response = await axios.post(config.endpoint, null, { params: order });
+    await Order.updateOne({ _id: orderDetail.id, paymentStatus: "unpaid", deleted: false }, {
+      $set: { zalopayTransactionId: order.app_trans_id }
+    });
+    const response = await axios.post(config.endpoint, null, { params: order, timeout: 10000 });
     if(response.data.return_code == 1) {
       res.redirect(response.data.order_url);
     } else {
-      res.redirect("/");
+      res.redirect("/cart");
     }
   } catch (error) {
-    res.redirect("/");
+    res.redirect("/cart");
   }
 }
+
+module.exports.paymentZaloPayReturn = async (req, res) => {
+  try {
+    const { orderId, phone } = req.query;
+    const orderDetail = await Order.findOne({
+      _id: orderId, phone, paymentMethod: "zalopay", deleted: false
+    });
+    if(!orderDetail) return res.redirect("/cart");
+
+    if(orderDetail.paymentStatus !== "paid") {
+      if(req.query.status !== "1") return res.redirect("/cart");
+      const fields = ["appid", "apptransid", "pmcid", "bankcode", "amount", "discountamount", "status"];
+      const checksumData = fields.map(field => req.query[field] ?? "").join("|");
+      const checksum = CryptoJS.HmacSHA256(checksumData, process.env.ZALOPAY_KEY2).toString();
+      if(checksum !== req.query.checksum || req.query.appid !== process.env.ZALOPAY_APPID ||
+        req.query.apptransid !== orderDetail.zalopayTransactionId) return res.redirect("/cart");
+
+      // Verify with ZaloPay if its callback has not reached the website yet.
+      const params = {
+        app_id: process.env.ZALOPAY_APPID,
+        app_trans_id: orderDetail.zalopayTransactionId
+      };
+      params.mac = CryptoJS.HmacSHA256(`${params.app_id}|${params.app_trans_id}|${process.env.ZALOPAY_KEY1}`, process.env.ZALOPAY_KEY1).toString();
+      const response = await axios.post(`${process.env.ZALOPAY_DOMAIN}/v2/query`, null, { params, timeout: 10000 });
+      if(response.data.return_code !== 1 || Number(response.data.amount) !== orderDetail.total) {
+        return res.redirect("/cart");
+      }
+      await Order.updateOne({ _id: orderDetail.id, deleted: false, paymentStatus: "unpaid" }, {
+        $set: { paymentStatus: "paid" }
+      });
+    }
+
+    res.redirect(`/order/success?${new URLSearchParams({ orderId: orderDetail.id, phone: orderDetail.phone })}`);
+  } catch (error) {
+    res.redirect("/cart");
+  }
+};
 
 module.exports.paymentZaloPayResultPost = async (req, res) => {
   const config = {
@@ -255,6 +296,7 @@ module.exports.paymentVNPay = async (req, res) => {
     const orderDetail = await Order.findOne({
       _id: orderId,
       paymentStatus: "unpaid",
+      paymentMethod: "vnpay",
       deleted: false
     });
 
@@ -263,19 +305,15 @@ module.exports.paymentVNPay = async (req, res) => {
       return;
     }
 
-    let date = new Date();
-    let createDate = moment(date).format('YYYYMMDDHHmmss');
+    const date = moment().utcOffset(7);
+    const createDate = date.format('YYYYMMDDHHmmss');
     
-    let ipAddr = req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress;
+    const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || "127.0.0.1";
+    const ipAddr = rawIp.split(",")[0].trim().replace(/^::ffff:/, "").replace(/^::1$/, "127.0.0.1");
     
     let tmnCode = process.env.VNPAY_CODE;
-    let secretKey = process.env.VNPAY_SECRET;
-    let vnpUrl = process.env.VNPAY_URL;
-    let returnUrl = `${process.env.DOMAIN_WEBSITE}/order/payment-vnpay-result`;
-    let orderIdVNP = `${orderId}-${Date.now()}`;
+    const returnUrl = `${req.protocol}://${req.get("host")}/order/payment-vnpay-result`;
+    const orderIdVNP = `${orderId}${Date.now()}${crypto.randomBytes(3).toString("hex")}`;
     let amount = orderDetail.total;
     let bankCode = "";
     
@@ -288,71 +326,68 @@ module.exports.paymentVNPay = async (req, res) => {
     vnp_Params['vnp_Locale'] = locale;
     vnp_Params['vnp_CurrCode'] = currCode;
     vnp_Params['vnp_TxnRef'] = orderIdVNP;
-    vnp_Params['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + orderIdVNP;
+    vnp_Params['vnp_OrderInfo'] = 'Thanh toan don hang ' + orderIdVNP;
     vnp_Params['vnp_OrderType'] = 'other';
     vnp_Params['vnp_Amount'] = amount * 100;
     vnp_Params['vnp_ReturnUrl'] = returnUrl;
     vnp_Params['vnp_IpAddr'] = ipAddr;
     vnp_Params['vnp_CreateDate'] = createDate;
+    vnp_Params['vnp_ExpireDate'] = date.clone().add(15, "minutes").format('YYYYMMDDHHmmss');
     if(bankCode !== null && bankCode !== ''){
         vnp_Params['vnp_BankCode'] = bankCode;
     }
 
-    vnp_Params = sortHelper.sortObject(vnp_Params);
-
-    let querystring = require('qs');
-    let signData = querystring.stringify(vnp_Params, { encode: false });
-    let crypto = require("crypto");     
-    let hmac = crypto.createHmac("sha512", secretKey);
-    let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex"); 
-    vnp_Params['vnp_SecureHash'] = signed;
-    vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-
-    res.redirect(vnpUrl)
+    await Order.updateOne({ _id: orderId, paymentStatus: "unpaid", deleted: false }, {
+      $set: { vnpayTransactionId: orderIdVNP },
+      $unset: { vnpayResponseCode: "" }
+    });
+    res.redirect(vnpayHelper.buildUrl(vnp_Params));
   } catch (error) {
     res.redirect("/");
   }
 }
 
 module.exports.paymentVNPayResult = async (req, res) => {
-  let vnp_Params = req.query;
-
-  let secureHash = vnp_Params['vnp_SecureHash'];
-
-  delete vnp_Params['vnp_SecureHash'];
-  delete vnp_Params['vnp_SecureHashType'];
-
-  vnp_Params = sortHelper.sortObject(vnp_Params);
-
-  let secretKey = process.env.VNPAY_SECRET;
-
-  let querystring = require('qs');
-  let signData = querystring.stringify(vnp_Params, { encode: false });
-  let crypto = require("crypto");     
-  let hmac = crypto.createHmac("sha512", secretKey);
-  let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
-  
-  if(secureHash === signed){
-    if(vnp_Params["vnp_ResponseCode"] == "00" && vnp_Params["vnp_TransactionStatus"] == "00") {
-      const [ orderId, date ] = vnp_Params["vnp_TxnRef"].split("-");
-
-      const orderDetail = await Order.findOne({
-        _id: orderId,
-        deleted: false
-      });
-
-      await Order.updateOne({
-        _id: orderId,
-        deleted: false
-      }, {
-        paymentStatus: "paid"
-      })
-
-      res.redirect(`${process.env.DOMAIN_WEBSITE}/order/success?orderId=${orderId}&phone=${orderDetail.phone}`);
-    } else {
-      res.render('success', {code: '97'})
-    }
-  } else{
-    res.render('success', {code: '97'})
+  try {
+    const params = req.query;
+    if(!vnpayHelper.verify(params) || params.vnp_TmnCode !== process.env.VNPAY_CODE) return res.redirect("/cart");
+    const orderDetail = await Order.findOne({
+      vnpayTransactionId: params.vnp_TxnRef, paymentMethod: "vnpay", deleted: false
+    });
+    if(!orderDetail || Number(params.vnp_Amount) !== orderDetail.total * 100 ||
+      params.vnp_ResponseCode !== "00" || params.vnp_TransactionStatus !== "00") return res.redirect("/cart");
+    // The IPN endpoint updates payment status; this endpoint only displays it.
+    res.redirect(`/order/success?${new URLSearchParams({ orderId: orderDetail.id, phone: orderDetail.phone })}`);
+  } catch (error) {
+    res.redirect("/cart");
   }
-}
+};
+
+module.exports.paymentVNPayIPN = async (req, res) => {
+  try {
+    const params = req.query;
+    if(!vnpayHelper.verify(params) || params.vnp_TmnCode !== process.env.VNPAY_CODE) {
+      return res.json({ RspCode: "97", Message: "Invalid checksum" });
+    }
+    const orderDetail = await Order.findOne({
+      vnpayTransactionId: params.vnp_TxnRef, paymentMethod: "vnpay", deleted: false
+    });
+    if(!orderDetail) return res.json({ RspCode: "01", Message: "Order not found" });
+    if(Number(params.vnp_Amount) !== orderDetail.total * 100) return res.json({ RspCode: "04", Message: "Invalid amount" });
+    if(orderDetail.paymentStatus === "paid" || orderDetail.vnpayResponseCode !== undefined) {
+      return res.json({ RspCode: "02", Message: "Order already confirmed" });
+    }
+    if(!params.vnp_ResponseCode || !params.vnp_TransactionStatus) return res.json({ RspCode: "99", Message: "Missing transaction result" });
+    const update = { vnpayResponseCode: params.vnp_ResponseCode };
+    if(params.vnp_ResponseCode === "00" && params.vnp_TransactionStatus === "00") update.paymentStatus = "paid";
+    const result = await Order.updateOne({
+      _id: orderDetail.id, vnpayTransactionId: params.vnp_TxnRef, deleted: false,
+      paymentStatus: "unpaid", vnpayResponseCode: { $exists: false }
+    }, { $set: update });
+    res.json(result.modifiedCount > 0
+      ? { RspCode: "00", Message: "Success" }
+      : { RspCode: "02", Message: "Order already confirmed" });
+  } catch (error) {
+    res.json({ RspCode: "99", Message: "Internal error" });
+  }
+};
