@@ -45,14 +45,22 @@ test("permanent deletion is restricted to the trash", async () => {
 });
 test("trash pages contain at most five records and clamp an excessive page", async () => {
   Tour.countDocuments.mockResolvedValue(12); const result = query([]); Tour.find.mockReturnValue(result);
+  Account.find.mockReturnValue(query([])); Category.find.mockReturnValue(query([]));
   const res = response(); await controller.trash(request({ query: { page: "99" } }), res);
   expect(result.limit).toHaveBeenCalledWith(5); expect(result.skip).toHaveBeenCalledWith(10);
   expect(res.render.mock.calls[0][1].pagination).toMatchObject({ currentPage: 3, totalRecord: 12, totalPage: 3 });
 });
-test("parent category filter includes inactive descendants in admin lists", async () => {
+test.each(["list", "trash"])("%s filters include parent descendants and combine all selected criteria", async page => {
   // Descendants are queried first; the final query populates the dropdown.
   Category.find.mockImplementation(find => find.parent === "root" ? Promise.resolve([{ id: "child" }]) : find.parent ? Promise.resolve([]) : query([]));
   Tour.countDocuments.mockResolvedValue(0); Tour.find.mockReturnValue(query([])); Account.find.mockReturnValue(query([]));
-  await controller.list(request({ query: { category: "root" } }), response());
-  expect(Tour.countDocuments).toHaveBeenCalledWith(expect.objectContaining({ category: { $in: ["root", "child"] } }));
+  const res = response();
+  await controller[page](request({ query: { category: "root", status: "inactive", createdBy: "creator-id", priceRange: "2000000-4000000", startDate: "2026-10-01", endDate: "2026-10-07", keyword: "Ha Noi" } }), res);
+  const find = Tour.countDocuments.mock.calls[0][0];
+  expect(find).toMatchObject({ deleted: page === "trash", status: "inactive", createdBy: "creator-id", category: { $in: ["root", "child"] }, priceNewAdult: { $gte: 2000000, $lt: 4000000 } });
+  expect(find.slug.test("ha-noi-tour")).toBe(true);
+  expect(find.createdAt.$gte.getTime()).toBe(new Date(2026, 9, 1).getTime());
+  expect(find.createdAt.$lte.getTime()).toBe(new Date(2026, 9, 7, 23, 59, 59, 999).getTime());
+  expect(Tour.find).toHaveBeenCalledWith(find);
+  expect(res.render.mock.calls[0][1]).toEqual(expect.objectContaining({ accountAdminList: [], categoryList: [] }));
 });

@@ -43,26 +43,26 @@ module.exports.list = async (req, res) => {
   })
 }
 
-module.exports.list = async (req, res) => {
+const buildTourFilter = async (query, deleted) => {
   const find = {
-    deleted: false
+    deleted: deleted
   };
 
-  if(req.query.status) {
-    find.status = req.query.status;
+  if(query.status) {
+    find.status = query.status;
   }
 
-  if(req.query.createdBy) {
-    find.createdBy = req.query.createdBy;
+  if(query.createdBy) {
+    find.createdBy = query.createdBy;
   }
 
-  if(req.query.category) {
-    const categoryIds = await categoryHelper.getAllSubcategoryIds(req.query.category, false);
+  if(query.category) {
+    const categoryIds = await categoryHelper.getAllSubcategoryIds(query.category, false);
     find.category = { $in: categoryIds };
   }
 
-  if(req.query.priceRange) {
-    switch (req.query.priceRange) {
+  if(query.priceRange) {
+    switch (query.priceRange) {
       case "under-2000000":
         find.priceNewAdult = { $lt: 2000000 };
         break;
@@ -86,24 +86,30 @@ module.exports.list = async (req, res) => {
 
   const dateFilter = {};
 
-  if(req.query.startDate) {
-    dateFilter.$gte = moment(req.query.startDate).startOf("date").toDate();
+  if(query.startDate) {
+    dateFilter.$gte = moment(query.startDate).startOf("date").toDate();
   }
 
-  if(req.query.endDate) {
-    dateFilter.$lte = moment(req.query.endDate).endOf("date").toDate();
+  if(query.endDate) {
+    dateFilter.$lte = moment(query.endDate).endOf("date").toDate();
   }
 
   if(Object.keys(dateFilter).length > 0) {
     find.createdAt = dateFilter;
   }
 
-  if(req.query.keyword) {
-    const keyword = slugify(req.query.keyword, {
+  if(query.keyword) {
+    const keyword = slugify(query.keyword, {
       lower: true
     });
     find.slug = new RegExp(keyword, "i");
   }
+
+  return find;
+};
+
+module.exports.list = async (req, res) => {
+  const find = await buildTourFilter(req.query, false);
 
   const limitItems = 9;
   let page = 1;
@@ -246,9 +252,7 @@ module.exports.createPost = async (req, res) => {
 }
 
 module.exports.trash = async (req, res) => {
-  const find = {
-    deleted: true
-  };
+  const find = await buildTourFilter(req.query, true);
 
   const limitItems = 5;
   const totalRecord = await Tour.countDocuments(find);
@@ -285,8 +289,13 @@ module.exports.trash = async (req, res) => {
     item.deletedAtFormat = moment(item.deletedAt).format("HH:mm - DD/MM/YYYY");
   }
 
+  const accountAdminList = await AccountAdmin.find({}).select("id fullName");
+  const categoryList = await Category.find({ deleted: false }).select("id name");
+
   res.render("admin/pages/tour-trash", {
     pageTitle: "Thùng rác tour",
+    accountAdminList,
+    categoryList,
     tourList: tourList,
     pagination: pagination
   })

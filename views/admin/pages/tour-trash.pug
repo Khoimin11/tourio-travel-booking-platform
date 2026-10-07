@@ -9,36 +9,36 @@ block main
       .section-4.admin-filters
         .inner-wrap
           .inner-item
-            select
+            select(filter-status)
               option(value="") Trạng thái
-              option(value="") Hoạt động
-              option(value="") Tạm dừng
+              option(value="active") Hoạt động
+              option(value="inactive") Tạm dừng
           .inner-item
-            select
+            select(filter-created-by)
               option(value="") Người tạo
-              option(value="") Lê Văn A
-              option(value="") Lê Văn B
+              each item in accountAdminList
+                option(value=item.id) #{item.fullName}
           .inner-item
-            select
+            select(filter-category)
               option(value="") Danh mục
-              option(value="") Danh mục 1
-              option(value="") Danh mục 2
+              each item in categoryList
+                option(value=item.id) #{item.name}
           .inner-item
-            select
+            select(filter-price-range)
               option(value="") Mức giá
-              option(value="") Dưới 2tr
-              option(value="") 2tr đến 4tr
-              option(value="") 4tr đến 8tr
-              option(value="") Trên 8tr
+              option(value="under-2000000") Dưới 2tr
+              option(value="2000000-4000000") 2tr đến 4tr
+              option(value="4000000-8000000") 4tr đến 8tr
+              option(value="over-8000000") Trên 8tr
           .inner-item.inner-date
             label
               span Từ ngày
-              input(type="date")
+              input(type="date" filter-start-date)
             span.date-separator –
             label
               span Đến ngày
-              input(type="date")
-          button.inner-item.inner-reset(type="button")
+              input(type="date" filter-end-date)
+          button.inner-item.inner-reset(type="button" filter-reset)
             <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
       //- End Section 4
 
@@ -56,13 +56,7 @@ block main
               button Áp dụng
           .inner-search
             <i class="fa-solid fa-magnifying-glass"></i>
-            input(type="text" placeholder="Tìm kiếm")
-          if (permissions.includes("tour-create"))
-            .inner-button-create
-              a(href=`/${pathAdmin}/tour/create`) + Tạo mới
-          if (permissions.includes("tour-trash"))
-            .inner-button-trash
-              a(href=`/${pathAdmin}/tour/trash`) Thùng rác
+            input(type="text" placeholder="Tìm kiếm" search)
       //- End Section 5
 
     //- Section 6
