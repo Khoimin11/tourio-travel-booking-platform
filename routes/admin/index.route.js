@@ -18,6 +18,10 @@ router.use((req, res, next) => {
   next();
 })
 
+router.get('/', authMiddleware.verifyToken, (req, res) => {
+  res.redirect(`/${pathAdmin}/dashboard`);
+});
+
 router.use('/account', accountRoutes)
 router.use('/dashboard', authMiddleware.verifyToken, dashboardRoutes)
 router.use('/category', authMiddleware.verifyToken, categoryRoutes)

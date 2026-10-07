@@ -1,7 +1,7 @@
 extends ../layouts/default.pug
 
 block main
-  h1.box-title Quản lý người dùng
+  h1.box-title Quản lý quản trị viên
 
   //- Section 4
   .section-4
@@ -71,15 +71,15 @@ block main
                   .badge.badge-red Tạm dừng
               td
                 .inner-buttons
-                  a(class="inner-edit" href=`/${pathAdmin}/user/edit/${item.id}` title="Chỉnh sửa người dùng" aria-label="Chỉnh sửa người dùng") <i class="fa-regular fa-pen-to-square"></i>
+                  a(class="inner-edit" href=`/${pathAdmin}/user/edit/${item.id}` title="Chỉnh sửa quản trị viên" aria-label="Chỉnh sửa quản trị viên") <i class="fa-regular fa-pen-to-square"></i>
                   button(
                     type="button"
                     class="inner-delete"
-                    title="Xóa người dùng"
-                    aria-label="Xóa người dùng"
+                    title="Xóa quản trị viên"
+                    aria-label="Xóa quản trị viên"
                     button-delete
                     data-api=`/${pathAdmin}/user/delete/${item.id}`
-                    data-confirm="Bạn có chắc muốn xóa người dùng này?"
+                    data-confirm="Bạn có chắc muốn xóa quản trị viên này?"
                   ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 

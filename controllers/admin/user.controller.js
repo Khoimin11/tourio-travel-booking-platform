@@ -75,7 +75,7 @@ module.exports.list = async (req, res) => {
   }
 
   res.render("admin/pages/user-list", {
-    pageTitle: "Quản lý người dùng",
+    pageTitle: "Quản lý quản trị viên",
     userList: userList,
     pagination: pagination
   })
@@ -91,7 +91,7 @@ module.exports.edit = async (req, res) => {
 
     const roleList = await Role.find({ deleted: false });
     res.render("admin/pages/setting-account-admin-edit", {
-      pageTitle: "Chỉnh sửa người dùng",
+      pageTitle: "Chỉnh sửa quản trị viên",
       accountAdminDetail,
       roleList,
       editApi: `/${pathAdmin}/user/edit/${accountAdminDetail.id}`,
@@ -119,7 +119,7 @@ module.exports.editPatch = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await AccountAdmin.findOne({ _id: id, deleted: false });
-    if(!user) return res.json({ code: "error", message: "Người dùng không tồn tại!" });
+    if(!user) return res.json({ code: "error", message: "Quản trị viên không tồn tại!" });
     if(id === req.account.id && value.status !== "active") {
       return res.json({ code: "error", message: "Không thể dừng hoạt động tài khoản đang đăng nhập!" });
     }
@@ -134,11 +134,11 @@ module.exports.editPatch = async (req, res) => {
     if(req.file) value.avatar = req.file.path;
     value.updatedBy = req.account.id;
     const result = await AccountAdmin.updateOne({ _id: id, deleted: false }, { $set: value });
-    if(result.matchedCount === 0) return res.json({ code: "error", message: "Người dùng không tồn tại!" });
-    req.flash("success", "Cập nhật người dùng thành công!");
+    if(result.matchedCount === 0) return res.json({ code: "error", message: "Quản trị viên không tồn tại!" });
+    req.flash("success", "Cập nhật quản trị viên thành công!");
     res.json({ code: "success" });
   } catch (error) {
-    res.json({ code: "error", message: "Không thể cập nhật người dùng!" });
+    res.json({ code: "error", message: "Không thể cập nhật quản trị viên!" });
   }
 };
 
@@ -156,10 +156,10 @@ module.exports.deletePatch = async (req, res) => {
         updatedBy: req.account.id
       }
     });
-    if(result.matchedCount === 0) return res.json({ code: "error", message: "Người dùng không tồn tại!" });
-    req.flash("success", "Xóa người dùng thành công!");
+    if(result.matchedCount === 0) return res.json({ code: "error", message: "Quản trị viên không tồn tại!" });
+    req.flash("success", "Xóa quản trị viên thành công!");
     res.json({ code: "success" });
   } catch (error) {
-    res.json({ code: "error", message: "Không thể xóa người dùng!" });
+    res.json({ code: "error", message: "Không thể xóa quản trị viên!" });
   }
 };
