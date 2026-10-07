@@ -3,40 +3,43 @@ extends ../layouts/default.pug
 block main
   h1.box-title Quản lý quản trị viên
 
-  //- Section 4
-  .section-4
-    .inner-wrap
-      .inner-item.inner-label
-        <i class="fa-solid fa-filter"></i> Bộ lọc
-      .inner-item
-        select(filter-status)
-          option(value="") Trạng thái
-          option(value="active") Hoạt động
-          option(value="inactive") Tạm dừng
-      .inner-item.inner-date
-        input(type="date" filter-start-date)
-        span -
-        input(type="date" filter-end-date)
-      .inner-item.inner-reset(filter-reset)
-        <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
-  //- End Section 4
+  .admin-toolbar
+    //- Section 4
+    .section-4.admin-filters(style="--filter-span: 12" class="filters-single")
+      .inner-wrap
+        .inner-item
+          select(filter-status)
+            option(value="") Trạng thái
+            option(value="active") Hoạt động
+            option(value="inactive") Tạm dừng
+        .inner-item.inner-date
+          label
+            span Từ ngày
+            input(type="date" filter-start-date)
+          span.date-separator –
+          label
+            span Đến ngày
+            input(type="date" filter-end-date)
+        button.inner-item.inner-reset(type="button" filter-reset)
+          <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
+    //- End Section 4
 
-  //- Section 5
-  .section-5
-    .inner-wrap
-      .inner-change-status
-        .inner-item
-          select
-            option(value="") -- Hành động --
-            option(value="") Hoạt động
-            option(value="") Dừng hoạt động
-            option(value="") Xóa
-        .inner-item
-          button Áp dụng
-      .inner-search
-        <i class="fa-solid fa-magnifying-glass"></i>
-        input(type="text" placeholder="Tìm kiếm" search)
-  //- End Section 5
+    //- Section 5
+    .section-5
+      .inner-wrap
+        .inner-change-status
+          .inner-item
+            select
+              option(value="") -- Hành động --
+              option(value="") Hoạt động
+              option(value="") Dừng hoạt động
+              option(value="") Xóa
+          .inner-item
+            button Áp dụng
+        .inner-search
+          <i class="fa-solid fa-magnifying-glass"></i>
+          input(type="text" placeholder="Tìm kiếm" search)
+    //- End Section 5
 
   //- Section 6
   .section-6

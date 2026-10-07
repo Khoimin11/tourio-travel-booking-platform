@@ -3,41 +3,44 @@ extends ../layouts/default.pug
 block main
   h1.box-title Quản lý đơn hàng
 
-  //- Section 4
-  .section-4
-    .inner-wrap
-      .inner-item.inner-label
-        <i class="fa-solid fa-filter"></i> Bộ lọc
-      .inner-item
-        select(filter-status)
-          option(value="") Trạng thái
-          each item in orderStatusList
-            option(value=item.value) #{item.label}
-      .inner-item.inner-date
-        input(type="date" filter-start-date)
-        span -
-        input(type="date" filter-end-date)
-      .inner-item
-        select(filter-payment-method)
-          option(value="") Phương thức thanh toán
-          each item in paymentMethodList
-            option(value=item.value) #{item.label}
-      .inner-item
-        select(filter-payment-status)
-          option(value="") Trạng thái thanh toán
-          each item in paymentStatusList
-            option(value=item.value) #{item.label}
-      .inner-item.inner-reset(filter-reset)
-        <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
-  //- End Section 4
+  .admin-toolbar.admin-toolbar-orders
+    //- Section 4
+    .section-4.admin-filters(style="--filter-span: 4")
+      .inner-wrap
+        .inner-item
+          select(filter-status)
+            option(value="") Trạng thái
+            each item in orderStatusList
+              option(value=item.value) #{item.label}
+        .inner-item
+          select(filter-payment-method)
+            option(value="") Phương thức thanh toán
+            each item in paymentMethodList
+              option(value=item.value) #{item.label}
+        .inner-item
+          select(filter-payment-status)
+            option(value="") Trạng thái thanh toán
+            each item in paymentStatusList
+              option(value=item.value) #{item.label}
+        .inner-item.inner-date
+          label
+            span Từ ngày
+            input(type="date" filter-start-date)
+          span.date-separator –
+          label
+            span Đến ngày
+            input(type="date" filter-end-date)
+        button.inner-item.inner-reset(type="button" filter-reset)
+          <i class="fa-solid fa-rotate-left"></i> Xóa bộ lọc
+    //- End Section 4
 
-  //- Section 5
-  .section-5
-    .inner-wrap
-      .inner-search
-        <i class="fa-solid fa-magnifying-glass"></i>
-        input(type="text" placeholder="Tìm kiếm" search)
-  //- End Section 5
+    //- Section 5
+    .section-5
+      .inner-wrap
+        .inner-search
+          <i class="fa-solid fa-magnifying-glass"></i>
+          input(type="text" placeholder="Tìm kiếm" search)
+    //- End Section 5
 
   //- Section 6
   .section-6

@@ -918,6 +918,114 @@ a {
     padding: 10px 14px;
   }
 }
+.admin-toolbar {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.admin-toolbar .admin-filters {
+  contain: inline-size;
+}
+
+.admin-toolbar-orders {
+  min-width: min(100%, 800px);
+}
+
+.admin-filters.filters-single .inner-item:first-child {
+  grid-column: 1 / -1;
+}
+
+.section-4.admin-filters .inner-wrap {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  width: 100%;
+  overflow: hidden;
+}
+
+.section-4.admin-filters .inner-item {
+  min-width: 0;
+  padding: 18px 22px;
+}
+
+.admin-filters .inner-item:has(select) {
+  grid-column: span var(--filter-span, 3);
+}
+
+.admin-filters.filters-date-only .inner-item {
+  border-top: 0;
+}
+
+.admin-filters .inner-item select {
+  width: 100%;
+  background: transparent;
+}
+
+.admin-filters .inner-item:has(+ .inner-date) {
+  border-right: 0;
+}
+
+.admin-filters .inner-date {
+  grid-column: span 9;
+  border-top: 1px solid #D5D5D5;
+  border-right: 0;
+}
+
+.admin-filters .inner-date label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.admin-filters .inner-date label span {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.admin-filters .inner-reset {
+  grid-column: span 3;
+  justify-content: flex-end;
+  border: 0;
+  border-top: 1px solid #D5D5D5;
+  background: transparent;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .section-4.admin-filters .inner-wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-filters .inner-item:has(select) {
+    grid-column: span 1;
+  }
+
+  .admin-filters.filters-single .inner-item:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-filters .inner-item:nth-child(2) {
+    border-right: 0;
+  }
+
+  .admin-filters .inner-item:nth-child(3),
+  .admin-filters .inner-item:has(+ .inner-date) {
+    border-top: 1px solid #D5D5D5;
+  }
+
+  .admin-filters .inner-date {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+
+  .admin-filters .date-separator {
+    display: none;
+  }
+
+  .admin-filters .inner-reset {
+    grid-column: 1 / -1;
+  }
+}
 /* End Section 4 */
 
 /* Section 5 */
