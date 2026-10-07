@@ -1,7 +1,7 @@
 extends ../layouts/default.pug
 
 block main
-  h1.box-title Quản lý đơn hàng
+  h1.box-title Thùng rác đơn hàng
 
   .admin-toolbar.admin-toolbar-orders
     //- Section 4
@@ -37,20 +37,17 @@ block main
     //- Section 5
     .section-5
       .inner-wrap
-        .inner-change-status(change-multi data-api=`/${pathAdmin}/order/change-multi`)
+        .inner-change-status(change-multi data-api=`/${pathAdmin}/order/trash/change-multi`)
           .inner-item
             select(aria-label="Hành động cho đơn hàng đã chọn")
               option(value="" disabled hidden selected) -- Hành động --
-              if permissions.includes("order-delete")
-                option(value="delete") Xóa
+              option(value="undo") Khôi phục
+              option(value="delete-destroy") Xóa vĩnh viễn
           .inner-item
             button(type="button") Áp dụng
         .inner-search
           <i class="fa-solid fa-magnifying-glass"></i>
           input(type="text" placeholder="Tìm kiếm" search)
-        if permissions.includes("order-trash")
-          .inner-button-trash
-            a(href=`/${pathAdmin}/order/trash`) Thùng rác
     //- End Section 5
 
   //- Section 6
@@ -107,12 +104,23 @@ block main
                 div #{orderDetail.createdAtDate}
               td
                 .inner-buttons
-                  a(
-                    href=`/${pathAdmin}/order/edit/${orderDetail.id}`
+                  button(
+                    type="button"
                     class="inner-edit"
-                  ) <i class="fa-regular fa-pen-to-square"></i>
-                  if permissions.includes("order-delete")
-                    button(type="button" class="inner-delete" button-delete data-api=`/${pathAdmin}/order/delete/${orderDetail.id}` data-confirm="Chuyển đơn hàng này vào thùng rác?") <i class="fa-regular fa-trash-can"></i>
+                    title="Khôi phục đơn hàng"
+                    aria-label="Khôi phục đơn hàng"
+                    button-undo
+                    data-api=`/${pathAdmin}/order/undo/${orderDetail.id}`
+                  ) <i class="fa-solid fa-rotate-left"></i>
+                  button(
+                    type="button"
+                    class="inner-delete"
+                    title="Xóa vĩnh viễn"
+                    aria-label="Xóa vĩnh viễn đơn hàng"
+                    button-delete
+                    data-confirm="Xóa vĩnh viễn đơn hàng này? Thao tác này không thể hoàn tác."
+                    data-api=`/${pathAdmin}/order/delete-destroy/${orderDetail.id}`
+                  ) <i class="fa-regular fa-trash-can"></i>
   //- End Section 6
 
   //- Section 7

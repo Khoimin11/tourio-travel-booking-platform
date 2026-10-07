@@ -1589,7 +1589,7 @@ if(changeMulti) {
     const option = select.value;
     const listInputChecked = document.querySelectorAll("[check-item]:checked");
     if(option && listInputChecked.length > 0) {
-      if(option === "delete-destroy" && !confirm("Xóa vĩnh viễn các tour đã chọn? Thao tác này không thể hoàn tác.")) return;
+      if(option === "delete-destroy" && !confirm("Xóa vĩnh viễn các bản ghi đã chọn? Thao tác này không thể hoàn tác.")) return;
       const ids = [];
       listInputChecked.forEach(inputChecked => {
         const id = inputChecked.getAttribute("check-item");
