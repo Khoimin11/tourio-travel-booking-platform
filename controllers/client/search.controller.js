@@ -1,4 +1,6 @@
 const Tour = require("../../models/tour.model");
+const Category = require("../../models/category.model");
+const categoryHelper = require("../../helpers/category.helper");
 const moment = require("moment");
 const slugify = require('slugify');
 const paginationHelper = require("../../helpers/pagination.helper");
@@ -16,12 +18,18 @@ module.exports.list = async (req, res) => {
   // Hết Điểm đi
 
   // Điểm đến
-  if(req.query.locationTo) {
-    const keyword = slugify(req.query.locationTo, {
+  if(req.query.locationTo?.trim()) {
+    const keyword = slugify(req.query.locationTo.trim(), {
       lower: true
     });
-    const keywordRegex = new RegExp(keyword);
-    find.slug = keywordRegex;
+    const keywordRegex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    const categories = await Category.find({ status: "active", deleted: false, slug: keywordRegex });
+    const categoryGroups = await Promise.all(categories.map(category => categoryHelper.getAllSubcategoryIds(category.id)));
+    const categoryIds = [...new Set(categoryGroups.flat())];
+    find.$or = [
+      { slug: keywordRegex },
+      { category: { $in: categoryIds } }
+    ];
   }
   // Hết Điểm đến
 
