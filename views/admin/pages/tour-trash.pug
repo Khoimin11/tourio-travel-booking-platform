@@ -10,22 +10,22 @@ block main
         .inner-wrap
           .inner-item
             select(filter-status)
-              option(value="") Trạng thái
+              option(value="" disabled hidden selected) Trạng thái
               option(value="active") Hoạt động
               option(value="inactive") Tạm dừng
           .inner-item
             select(filter-created-by)
-              option(value="") Người tạo
+              option(value="" disabled hidden selected) Người tạo
               each item in accountAdminList
                 option(value=item.id) #{item.fullName}
           .inner-item
             select(filter-category)
-              option(value="") Danh mục
+              option(value="" disabled hidden selected) Danh mục
               each item in categoryList
                 option(value=item.id) #{item.name}
           .inner-item
             select(filter-price-range)
-              option(value="") Mức giá
+              option(value="" disabled hidden selected) Mức giá
               option(value="under-2000000") Dưới 2tr
               option(value="2000000-4000000") 2tr đến 4tr
               option(value="4000000-8000000") 4tr đến 8tr
@@ -48,7 +48,7 @@ block main
           .inner-change-status(change-multi data-api=`/${pathAdmin}/tour/trash/change-multi`)
             .inner-item
               select
-                option(value="") -- Hành động --
+                option(value="" disabled hidden selected) -- Hành động --
                 if (permissions.includes("tour-trash"))
                   option(value="undo") Khôi phục
                   option(value="delete-destroy") Xóa vĩnh viễn

@@ -9,7 +9,7 @@ block main
       .inner-wrap
         .inner-item
           select(filter-status)
-            option(value="") Trạng thái
+            option(value="" disabled hidden selected) Trạng thái
             option(value="active") Hoạt động
             option(value="inactive") Tạm dừng
         .inner-item.inner-date
@@ -30,7 +30,7 @@ block main
         .inner-change-status
           .inner-item
             select
-              option(value="") -- Hành động --
+              option(value="" disabled hidden selected) -- Hành động --
               option(value="") Hoạt động
               option(value="") Dừng hoạt động
               option(value="") Xóa

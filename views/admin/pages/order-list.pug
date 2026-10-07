@@ -9,17 +9,17 @@ block main
       .inner-wrap
         .inner-item
           select(filter-status)
-            option(value="") Trạng thái
+            option(value="" disabled hidden selected) Trạng thái
             each item in orderStatusList
               option(value=item.value) #{item.label}
         .inner-item
           select(filter-payment-method)
-            option(value="") Phương thức thanh toán
+            option(value="" disabled hidden selected) Phương thức thanh toán
             each item in paymentMethodList
               option(value=item.value) #{item.label}
         .inner-item
           select(filter-payment-status)
-            option(value="") Trạng thái thanh toán
+            option(value="" disabled hidden selected) Trạng thái thanh toán
             each item in paymentStatusList
               option(value=item.value) #{item.label}
         .inner-item.inner-date

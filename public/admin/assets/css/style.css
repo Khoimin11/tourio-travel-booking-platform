@@ -955,9 +955,94 @@ a {
   border-top: 0;
 }
 
-.admin-filters .inner-item select {
+:is(.admin-filters, .inner-change-status) .inner-item select {
   width: 100%;
   background: transparent;
+  border-radius: 6px;
+}
+
+:is(.admin-filters, .inner-change-status) .inner-item select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 5px;
+}
+
+@supports (appearance: base-select) {
+  :is(.admin-filters, .inner-change-status) select,
+  :is(.admin-filters, .inner-change-status) select::picker(select) {
+    appearance: base-select;
+  }
+
+  :is(.admin-filters, .inner-change-status) select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+  }
+
+  :is(.admin-filters, .inner-change-status) select::picker-icon {
+    color: #64748b;
+    transition: rotate 160ms ease;
+  }
+
+  :is(.admin-filters, .inner-change-status) select:open {
+    color: var(--color-primary);
+  }
+
+  :is(.admin-filters, .inner-change-status) select:open::picker-icon {
+    rotate: 180deg;
+  }
+
+  :is(.admin-filters, .inner-change-status) select::picker(select) {
+    min-width: 200px;
+    max-width: calc(100vw - 32px);
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 12px;
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 12px 32px #0f172a1f;
+    font-family: inherit;
+    font-size: 14px;
+    scrollbar-width: thin;
+  }
+
+  :is(.admin-filters, .inner-change-status) select option {
+    padding: 11px 12px;
+    border-radius: 7px;
+    background: #fff;
+    color: var(--color-text);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  :is(.admin-filters, .inner-change-status) select option:hover,
+  :is(.admin-filters, .inner-change-status) select option:focus-visible {
+    background: #f1f5ff;
+    color: var(--color-primary);
+  }
+
+  :is(.admin-filters, .inner-change-status) select option:checked {
+    background: #eaf0ff;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  :is(.admin-filters, .inner-change-status) select option::checkmark {
+    color: var(--color-primary);
+  }
+
+  :is(.admin-filters, .inner-change-status) select option[hidden] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.admin-filters, .inner-change-status) select::picker-icon {
+    transition: none;
+  }
 }
 
 .admin-filters .inner-item:has(+ .inner-date) {

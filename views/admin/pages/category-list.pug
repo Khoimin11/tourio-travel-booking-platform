@@ -9,12 +9,12 @@ block main
       .inner-wrap
         .inner-item
           select(filter-status)
-            option(value="") Trạng thái
+            option(value="" disabled hidden selected) Trạng thái
             option(value="active") Hoạt động
             option(value="inactive") Tạm dừng
         .inner-item
           select(filter-created-by)
-            option(value="") Người tạo
+            option(value="" disabled hidden selected) Người tạo
             each item in accountAdminList
               option(value=item.id) #{item.fullName}
         .inner-item.inner-date
@@ -38,7 +38,7 @@ block main
         )
           .inner-item
             select
-              option(value="") -- Hành động --
+              option(value="" disabled hidden selected) -- Hành động --
               option(value="active") Hoạt động
               option(value="inactive") Dừng hoạt động
               option(value="delete") Xóa
