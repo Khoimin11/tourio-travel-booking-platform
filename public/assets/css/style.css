@@ -1,5 +1,7 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
 :root {
   --color-primary: #4502C7;
 }
@@ -188,6 +190,10 @@ input, button, textarea {
   padding: 1px 5px;
   margin-left: 4px;
   position: relative;
+}
+
+.header .inner-cart span[hidden] {
+  display: none;
 }
 
 .header .inner-cart span::before {
@@ -3027,5 +3033,9 @@ input, button, textarea {
 
 .alert-success {
   background-color: #a3e0a3;
+}
+
+.alert[cart-notice] {
+  font-family: "Nunito Sans", sans-serif;
 }
 /* End Alert */
